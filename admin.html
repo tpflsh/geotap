@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoTap 관리자</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
+<style>
+:root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#2d333b;--accent:#2ea043;--accent2:#3fb950;--t1:#e6edf3;--t2:#8b949e;--t3:#484f58;--bdr:rgba(255,255,255,0.08);--amber:#d29922;--red:#f85149;--blue:#58a6ff;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg0);color:var(--t1);font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;min-height:100vh;}
+
+/* 레이아웃 */
+#app{display:flex;height:100vh;overflow:hidden;}
+#sidebar{width:240px;background:var(--bg1);border-right:1px solid var(--bdr);display:flex;flex-direction:column;flex-shrink:0;}
+#sidebar-header{padding:20px 16px 16px;border-bottom:1px solid var(--bdr);}
+.admin-logo{font-size:18px;font-weight:700;margin-bottom:2px;}<br>
+.admin-logo span{color:var(--accent2);}
+.admin-sub{font-size:11px;color:var(--t3);}
+#country-list{flex:1;overflow-y:auto;padding:8px;}
+#country-list::-webkit-scrollbar{width:3px;}
+#country-list::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px;}
+.country-item{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:6px;cursor:pointer;margin-bottom:2px;}
+.country-item:hover{background:var(--bg2);}
+.country-item.active{background:var(--bg3);color:var(--t1);}
+.country-item .ci-flag{font-size:16px;flex-shrink:0;}
+.country-item .ci-name{font-size:12px;flex:1;}
+.country-item .ci-badge{font-size:10px;padding:1px 6px;border-radius:4px;background:rgba(46,160,67,0.15);color:var(--accent2);border:1px solid rgba(46,160,67,0.2);}
+#sidebar-footer{padding:12px 16px;border-top:1px solid var(--bdr);}
+.btn-new{width:100%;padding:8px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;}
+.btn-new:hover{background:var(--accent2);}
+
+#main{flex:1;display:flex;flex-direction:column;overflow:hidden;}
+#topbar{height:48px;background:var(--bg1);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0;}
+#topbar-title{font-size:14px;font-weight:500;flex:1;}
+.btn-save{padding:7px 16px;background:var(--accent);color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:500;cursor:pointer;display:flex;align-items:center;gap:6px;}
+.btn-save:hover{background:var(--accent2);}
+.btn-save:disabled{background:var(--bg3);color:var(--t3);cursor:not-allowed;}
+.btn-delete{padding:7px 12px;background:rgba(248,81,73,0.1);color:var(--red);border:1px solid rgba(248,81,73,0.2);border-radius:6px;font-size:12px;cursor:pointer;}
+.btn-delete:hover{background:rgba(248,81,73,0.2);}
+
+#editor{flex:1;overflow-y:auto;padding:24px;}
+#editor::-webkit-scrollbar{width:4px;}
+#editor::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px;}
+
+/* 폼 */
+.section{background:var(--bg1);border:1px solid var(--bdr);border-radius:10px;padding:20px;margin-bottom:16px;}
+.section-title{font-size:13px;font-weight:500;color:var(--t1);margin-bottom:14px;display:flex;align-items:center;gap:8px;}
+.section-title i{color:var(--t2);}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:11px;color:var(--t2);margin-bottom:5px;}
+.field input,.field textarea,.field select{width:100%;background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;color:var(--t1);font-size:12px;font-family:inherit;outline:none;transition:border-color 0.15s;}
+.field input:focus,.field textarea:focus,.field select:focus{border-color:var(--accent);}
+.field textarea{resize:vertical;min-height:70px;line-height:1.6;}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.field-row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+
+/* 카테고리 섹션 */
+.cat-section{border:1px solid var(--bdr);border-radius:8px;overflow:hidden;margin-bottom:10px;}
+.cat-header{display:flex;align-items:center;gap:8px;padding:10px 14px;background:var(--bg2);cursor:pointer;user-select:none;}
+.cat-header:hover{background:var(--bg3);}
+.cat-header-title{font-size:12px;font-weight:500;flex:1;}
+.cat-header-chev{font-size:12px;color:var(--t3);transition:transform 0.2s;}
+.cat-header.open .cat-header-chev{transform:rotate(180deg);}
+.cat-body{display:none;padding:14px;}
+.cat-body.open{display:block;}
+
+/* 키워드 */
+.kw-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.kw-item{background:var(--bg0);border:1px solid var(--bdr);border-radius:6px;padding:10px 12px;position:relative;}
+.kw-item-header{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.kw-item-num{font-size:10px;color:var(--t3);flex-shrink:0;}
+.kw-item input{flex:1;}
+.btn-remove-kw{background:none;border:none;color:var(--t3);cursor:pointer;font-size:14px;padding:2px;}
+.btn-remove-kw:hover{color:var(--red);}
+.btn-add-kw{width:100%;padding:7px;background:none;border:1px dashed var(--bdr);border-radius:6px;color:var(--t3);font-size:12px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:5px;}
+.btn-add-kw:hover{border-color:var(--accent);color:var(--accent2);}
+
+/* 기출 포인트 */
+.exam-list{display:flex;flex-direction:column;gap:8px;margin-bottom:10px;}
+.exam-item{background:var(--bg0);border:1px solid var(--bdr);border-radius:6px;padding:10px 12px;}
+.exam-item-header{display:flex;align-items:center;gap:6px;margin-bottom:6px;}
+.exam-tags-input{font-size:11px;color:var(--t2);margin-top:4px;}
+.exam-tags-input small{display:block;margin-top:2px;color:var(--t3);font-size:10px;}
+.bichul-toggle{display:flex;align-items:center;gap:6px;margin-top:6px;}
+.bichul-toggle input{width:auto;}
+.bichul-toggle label{font-size:11px;color:var(--t2);}
+
+/* 알림 */
+#toast{position:fixed;bottom:24px;right:24px;background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px 16px;font-size:13px;display:none;align-items:center;gap:8px;z-index:100;max-width:300px;}
+#toast.show{display:flex;}
+#toast.success{border-color:rgba(46,160,67,0.4);color:var(--accent2);}
+#toast.error{border-color:rgba(248,81,73,0.4);color:var(--red);}
+
+/* 빈 상태 */
+#empty-state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:12px;color:var(--t3);}
+#empty-state i{font-size:40px;}
+#empty-state p{font-size:13px;}
+
+/* 로딩 */
+.spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.2);border-top-color:#fff;border-radius:50%;animation:spin 0.6s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- 사이드바 -->
+  <div id="sidebar">
+    <div id="sidebar-header">
+      <div class="admin-logo"><span>Geo</span>Tap <span style="font-size:11px;color:var(--t3);font-weight:400;">관리자</span></div>
+      <div class="admin-sub">국가 데이터 편집</div>
+    </div>
+    <div id="country-list">
+      <div style="font-size:11px;color:var(--t3);padding:6px 10px 4px;">DB 국가 목록</div>
+    </div>
+    <div id="sidebar-footer">
+      <button class="btn-new" onclick="newCountry()">
+        <i class="ti ti-plus" style="font-size:14px;"></i> 새 국가 추가
+      </button>
+    </div>
+  </div>
+
+  <!-- 메인 -->
+  <div id="main">
+    <div id="topbar">
+      <span id="topbar-title">국가를 선택하거나 새로 추가하세요</span>
+      <button class="btn-delete" id="btn-delete" style="display:none;" onclick="deleteCountry()">
+        <i class="ti ti-trash" style="font-size:13px;"></i> 삭제
+      </button>
+      <button class="btn-save" id="btn-save" onclick="saveCountry()">
+        <i class="ti ti-device-floppy" style="font-size:13px;"></i> 저장
+      </button>
+    </div>
+    <div id="editor">
+      <div id="empty-state">
+        <i class="ti ti-map-pin"></i>
+        <p>좌측에서 국가를 선택하거나 새로 추가해주세요</p>
+      </div>
+      <div id="form" style="display:none;">
+
+        <!-- 기본 정보 -->
+        <div class="section">
+          <div class="section-title"><i class="ti ti-info-circle"></i> 기본 정보</div>
+          <div class="field-row">
+            <div class="field">
+              <label>국가명 (영문) *</label>
+              <input type="text" id="f-name-en" placeholder="예: Brazil">
+            </div>
+            <div class="field">
+              <label>국가명 (한글) *</label>
+              <input type="text" id="f-name-kr" placeholder="예: 브라질">
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field">
+              <label>국기 이모지</label>
+              <input type="text" id="f-flag" placeholder="예: 🇧🇷">
+            </div>
+            <div class="field">
+              <label>대륙</label>
+              <select id="f-region">
+                <option value="">선택</option>
+                <option value="asia">아시아</option>
+                <option value="europe">유럽</option>
+                <option value="africa">아프리카</option>
+                <option value="namerica">북미</option>
+                <option value="samerica">남미</option>
+                <option value="oceania">오세아니아</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>한 줄 소개</label>
+            <textarea id="f-desc" rows="2" placeholder="예: 남아메리카 최대 국가. 아마존 열대우림과 광대한 브라질 고원이 특징."></textarea>
+          </div>
+          <div class="field">
+            <label>검색 태그 (쉼표로 구분)</label>
+            <input type="text" id="f-tags" placeholder="예: 브라질, brazil, af, aw, 열대우림, 포르투갈어">
+          </div>
+        </div>
+
+        <!-- 카테고리별 키워드 -->
+        <div class="section">
+          <div class="section-title"><i class="ti ti-category"></i> 카테고리별 키워드</div>
+          <div id="cat-sections"></div>
+        </div>
+
+        <!-- 기출 포인트 -->
+        <div class="section">
+          <div class="section-title"><i class="ti ti-star"></i> 기출 포인트 (평가원 기출)</div>
+          <div id="exam-list" class="exam-list"></div>
+          <button class="btn-add-kw" onclick="addExamPoint()">
+            <i class="ti ti-plus" style="font-size:12px;"></i> 기출 포인트 추가
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const SUPABASE_URL = 'https://jvkpxuvpjiyueefakkow.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2a3B4dXZwaml5dWVlZmFra293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjY0MjAsImV4cCI6MjA5MzkwMjQyMH0.DBhR0RK79LNqMud6dUEWiW3RUzuDGBVLr0Ohd773a9c';
+
+const HEADERS = {
+  'apikey': SUPABASE_KEY,
+  'Authorization': `Bearer ${SUPABASE_KEY}`,
+  'Content-Type': 'application/json',
+  'Prefer': 'return=representation'
+};
+
+const CATEGORIES = [
+  {id:'climate',    icon:'ti-cloud',           title:'기후'},
+  {id:'landform',   icon:'ti-mountain',        title:'지형',   type:'landform'},
+  {id:'religion',   icon:'ti-building-church', title:'종교/언어'},
+  {id:'population', icon:'ti-users',           title:'인구/도시화', type:'city'},
+  {id:'resource',   icon:'ti-bolt',            title:'자원/산업',  type:'resource'},
+  {id:'agriculture',icon:'ti-plant',           title:'농업'},
+  {id:'conflict',   icon:'ti-alert-triangle',  title:'분쟁/이슈 (국내)', type:'conflict'},
+  {id:'integration',icon:'ti-circles-relation',title:'지역통합체'},
+];
+
+let countries = [];
+let currentId = null;
+let isNew = false;
+
+// ── API ───────────────────────────────────────────
+async function api(method, path, body=null){
+  const opts = {method, headers: HEADERS};
+  if(body) opts.body = JSON.stringify(body);
+  const res = await fetch(SUPABASE_URL + path, opts);
+  if(!res.ok){
+    const err = await res.text();
+    throw new Error(err);
+  }
+  const text = await res.text();
+  return text ? JSON.parse(text) : null;
+}
+
+// ── 데이터 로드 ───────────────────────────────────
+async function loadCountries(){
+  try {
+    countries = await api('GET', '/rest/v1/countries?select=*&order=name_kr.asc');
+    renderList();
+  } catch(e){
+    toast('데이터 로드 실패: ' + e.message, 'error');
+  }
+}
+
+function renderList(){
+  const list = document.getElementById('country-list');
+  list.innerHTML = '<div style="font-size:11px;color:var(--t3);padding:6px 10px 4px;">DB 국가 목록 (' + countries.length + '개)</div>';
+  countries.forEach(c => {
+    const el = document.createElement('div');
+    el.className = 'country-item' + (c.id === currentId ? ' active' : '');
+    el.innerHTML = `
+      <span class="ci-flag">${c.flag||'🌍'}</span>
+      <span class="ci-name">${c.name_kr||c.name_en}</span>
+      <span class="ci-badge">완료</span>
+    `;
+    el.onclick = () => selectCountry(c.id);
+    list.appendChild(el);
+  });
+}
+
+// ── 국가 선택 ─────────────────────────────────────
+function selectCountry(id){
+  currentId = id;
+  isNew = false;
+  const c = countries.find(x => x.id === id);
+  if(!c) return;
+  renderList();
+  showForm(c);
+}
+
+function showForm(c){
+  document.getElementById('empty-state').style.display = 'none';
+  document.getElementById('form').style.display = 'block';
+  document.getElementById('btn-delete').style.display = isNew ? 'none' : 'flex';
+  document.getElementById('topbar-title').textContent = c ? (c.name_kr || c.name_en || '새 국가') : '새 국가';
+
+  document.getElementById('f-name-en').value = c?.name_en || '';
+  document.getElementById('f-name-kr').value = c?.name_kr || '';
+  document.getElementById('f-flag').value = c?.flag || '';
+  document.getElementById('f-region').value = c?.region || '';
+  document.getElementById('f-desc').value = c?.description || '';
+  document.getElementById('f-tags').value = c?.search_tags || '';
+
+  renderCatSections(c?.categories || []);
+  renderExamPoints(c?.categories || []);
+}
+
+// ── 새 국가 ───────────────────────────────────────
+function newCountry(){
+  currentId = null;
+  isNew = true;
+  renderList();
+  showForm(null);
+  document.getElementById('topbar-title').textContent = '새 국가 추가';
+  document.getElementById('btn-delete').style.display = 'none';
+}
+
+// ── 카테고리 섹션 렌더 ────────────────────────────
+function renderCatSections(cats){
+  const container = document.getElementById('cat-sections');
+  container.innerHTML = '';
+  CATEGORIES.forEach(catDef => {
+    const existing = cats.find(c => c.id === catDef.id) || {id: catDef.id, keywords: []};
+    const sec = document.createElement('div');
+    sec.className = 'cat-section';
+    sec.id = 'cat-sec-' + catDef.id;
+    sec.innerHTML = `
+      <div class="cat-header" onclick="toggleCat('${catDef.id}')">
+        <i class="ti ${catDef.icon}" style="font-size:14px;color:var(--t2);"></i>
+        <span class="cat-header-title">${catDef.title}</span>
+        <span style="font-size:10px;color:var(--t3);">${(existing.keywords||[]).length}개 키워드</span>
+        <i class="ti ti-chevron-down cat-header-chev"></i>
+      </div>
+      <div class="cat-body" id="cat-body-${catDef.id}">
+        <div class="kw-list" id="kw-list-${catDef.id}"></div>
+        <button class="btn-add-kw" onclick="addKeyword('${catDef.id}')">
+          <i class="ti ti-plus" style="font-size:12px;"></i> 키워드 추가
+        </button>
+      </div>
+    `;
+    container.appendChild(sec);
+    renderKeywords(catDef.id, existing.keywords || []);
+  });
+}
+
+function toggleCat(id){
+  const header = document.querySelector(`#cat-sec-${id} .cat-header`);
+  const body = document.getElementById(`cat-body-${id}`);
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+
+function renderKeywords(catId, keywords){
+  const list = document.getElementById(`kw-list-${catId}`);
+  list.innerHTML = '';
+  keywords.forEach((kw, i) => {
+    list.appendChild(makeKwItem(catId, i, kw));
+  });
+}
+
+function makeKwItem(catId, idx, kw){
+  const div = document.createElement('div');
+  div.className = 'kw-item';
+  div.id = `kw-${catId}-${idx}`;
+  const hasLoc = CATEGORIES.find(c=>c.id===catId)?.type === 'landform' || CATEGORIES.find(c=>c.id===catId)?.type === 'resource' || CATEGORIES.find(c=>c.id===catId)?.type === 'conflict' || CATEGORIES.find(c=>c.id===catId)?.type === 'city';
+  div.innerHTML = `
+    <div class="kw-item-header">
+      <span class="kw-item-num">${idx+1}</span>
+      <input type="text" placeholder="키워드 (예: Af 열대우림)" value="${escHtml(kw.k||'')}" data-field="k" data-cat="${catId}" data-idx="${idx}">
+      <button class="btn-remove-kw" onclick="removeKeyword('${catId}',${idx})"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="field">
+      <textarea placeholder="설명 (태그 클릭하면 뜨는 내용)" rows="2" data-field="d" data-cat="${catId}" data-idx="${idx}">${escHtml(kw.d||'')}</textarea>
+    </div>
+    ${hasLoc ? `
+    <div class="field-row" style="margin-top:6px;">
+      <div class="field">
+        <label>위도 (선택)</label>
+        <input type="number" step="0.1" placeholder="예: -23.5" value="${kw.loc?kw.loc[0]:''}" data-field="lat" data-cat="${catId}" data-idx="${idx}">
+      </div>
+      <div class="field">
+        <label>경도 (선택)</label>
+        <input type="number" step="0.1" placeholder="예: -46.6" value="${kw.loc?kw.loc[1]:''}" data-field="lng" data-cat="${catId}" data-idx="${idx}">
+      </div>
+    </div>` : ''}
+  `;
+  return div;
+}
+
+function addKeyword(catId){
+  const list = document.getElementById(`kw-list-${catId}`);
+  const idx = list.children.length;
+  list.appendChild(makeKwItem(catId, idx, {k:'',d:''}));
+  updateKwCount(catId);
+}
+
+function removeKeyword(catId, idx){
+  const item = document.getElementById(`kw-${catId}-${idx}`);
+  if(item) item.remove();
+  // 재인덱싱
+  const list = document.getElementById(`kw-list-${catId}`);
+  Array.from(list.children).forEach((el, i) => {
+    el.id = `kw-${catId}-${i}`;
+    el.querySelector('.kw-item-num').textContent = i+1;
+    el.querySelectorAll('[data-idx]').forEach(inp => inp.dataset.idx = i);
+    el.querySelector('.btn-remove-kw').setAttribute('onclick', `removeKeyword('${catId}',${i})`);
+  });
+  updateKwCount(catId);
+}
+
+function updateKwCount(catId){
+  const list = document.getElementById(`kw-list-${catId}`);
+  const count = list.children.length;
+  const header = document.querySelector(`#cat-sec-${catId} .cat-header span[style]`);
+  if(header) header.textContent = `${count}개 키워드`;
+}
+
+// ── 기출 포인트 ───────────────────────────────────
+function renderExamPoints(cats){
+  const examCat = cats.find(c => c.isExam) || {points:[]};
+  const list = document.getElementById('exam-list');
+  list.innerHTML = '';
+  (examCat.points||[]).forEach((pt, i) => {
+    list.appendChild(makeExamItem(i, pt));
+  });
+}
+
+function makeExamItem(idx, pt){
+  const div = document.createElement('div');
+  div.className = 'exam-item';
+  div.id = `exam-${idx}`;
+  div.innerHTML = `
+    <div class="exam-item-header">
+      <span class="kw-item-num">${idx+1}</span>
+      <input type="text" placeholder="기출 포인트 설명" value="${escHtml(pt.text||'')}" data-exam-field="text" data-idx="${idx}" style="flex:1;">
+      <button class="btn-remove-kw" onclick="removeExam(${idx})"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="exam-tags-input">
+      <input type="text" placeholder="기출 태그 (쉼표 구분, 예: 24수능 19번, 23수능 20번)" value="${escHtml((pt.tags||[]).join(', '))}" data-exam-field="tags" data-idx="${idx}">
+      <small>형식: 24수능 19번, 23평가원6월 15번</small>
+    </div>
+    <div class="bichul-toggle">
+      <input type="checkbox" id="bichul-${idx}" data-exam-field="bichul" data-idx="${idx}" ${pt.bichul?'checked':''}>
+      <label for="bichul-${idx}">빈출 문제 (여러 해 반복 출제)</label>
+    </div>
+  `;
+  return div;
+}
+
+function addExamPoint(){
+  const list = document.getElementById('exam-list');
+  const idx = list.children.length;
+  list.appendChild(makeExamItem(idx, {text:'',tags:[],bichul:false}));
+}
+
+function removeExam(idx){
+  const item = document.getElementById(`exam-${idx}`);
+  if(item) item.remove();
+  const list = document.getElementById('exam-list');
+  Array.from(list.children).forEach((el,i)=>{
+    el.id=`exam-${i}`;
+    el.querySelector('.kw-item-num').textContent=i+1;
+    el.querySelectorAll('[data-idx]').forEach(inp=>inp.dataset.idx=i);
+    el.querySelector('.btn-remove-kw').setAttribute('onclick',`removeExam(${i})`);
+    const cb=el.querySelector('[type=checkbox]');
+    if(cb){cb.id=`bichul-${i}`;el.querySelector(`label`).setAttribute('for',`bichul-${i}`);}
+  });
+}
+
+// ── 데이터 수집 ───────────────────────────────────
+function collectData(){
+  const cats = [];
+
+  CATEGORIES.forEach(catDef => {
+    const list = document.getElementById(`kw-list-${catDef.id}`);
+    const keywords = [];
+    Array.from(list.children).forEach(item => {
+      const k = item.querySelector('[data-field="k"]')?.value?.trim() || '';
+      const d = item.querySelector('[data-field="d"]')?.value?.trim() || '';
+      if(!k) return;
+      const kw = {k, d};
+      const lat = item.querySelector('[data-field="lat"]')?.value;
+      const lng = item.querySelector('[data-field="lng"]')?.value;
+      if(lat && lng) kw.loc = [parseFloat(lat), parseFloat(lng)];
+      keywords.push(kw);
+    });
+    if(keywords.length > 0){
+      cats.push({
+        id: catDef.id,
+        ic: catDef.icon,
+        t: catDef.title,
+        type: catDef.type,
+        keywords
+      });
+    }
+  });
+
+  // 기출 포인트
+  const examList = document.getElementById('exam-list');
+  const points = [];
+  Array.from(examList.children).forEach(item => {
+    const text = item.querySelector('[data-exam-field="text"]')?.value?.trim() || '';
+    const tagsStr = item.querySelector('[data-exam-field="tags"]')?.value?.trim() || '';
+    const bichul = item.querySelector('[data-exam-field="bichul"]')?.checked || false;
+    if(!text) return;
+    const tags = tagsStr ? tagsStr.split(',').map(t=>t.trim()).filter(Boolean) : [];
+    points.push({text, tags, bichul});
+  });
+  if(points.length > 0){
+    cats.push({id:'exam', ic:'ti-star', t:'기출 포인트', isExam:true, points});
+  }
+
+  return {
+    name_en: document.getElementById('f-name-en').value.trim(),
+    name_kr: document.getElementById('f-name-kr').value.trim(),
+    flag: document.getElementById('f-flag').value.trim(),
+    region: document.getElementById('f-region').value,
+    description: document.getElementById('f-desc').value.trim(),
+    search_tags: document.getElementById('f-tags').value.trim(),
+    categories: cats
+  };
+}
+
+// ── 저장 ─────────────────────────────────────────
+async function saveCountry(){
+  const data = collectData();
+  if(!data.name_en){ toast('영문 국가명을 입력해주세요', 'error'); return; }
+  if(!data.name_kr){ toast('한글 국가명을 입력해주세요', 'error'); return; }
+
+  const btn = document.getElementById('btn-save');
+  btn.disabled = true;
+  btn.innerHTML = '<div class="spinner"></div> 저장 중...';
+
+  try {
+    if(isNew){
+      const result = await api('POST', '/rest/v1/countries', data);
+      if(result && result[0]) currentId = result[0].id;
+      isNew = false;
+      toast('새 국가가 추가됐어요! 🎉', 'success');
+    } else {
+      await api('PATCH', `/rest/v1/countries?id=eq.${currentId}`, data);
+      toast('저장 완료! ✅', 'success');
+    }
+    await loadCountries();
+    document.getElementById('btn-delete').style.display = 'flex';
+    document.getElementById('topbar-title').textContent = data.name_kr;
+  } catch(e){
+    toast('저장 실패: ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="ti ti-device-floppy" style="font-size:13px;"></i> 저장';
+  }
+}
+
+// ── 삭제 ─────────────────────────────────────────
+async function deleteCountry(){
+  if(!currentId) return;
+  const c = countries.find(x => x.id === currentId);
+  if(!confirm(`"${c?.name_kr||c?.name_en}" 을 삭제할까요? 이 작업은 되돌릴 수 없어요.`)) return;
+  try {
+    await api('DELETE', `/rest/v1/countries?id=eq.${currentId}`);
+    currentId = null;
+    document.getElementById('empty-state').style.display = 'flex';
+    document.getElementById('form').style.display = 'none';
+    document.getElementById('topbar-title').textContent = '국가를 선택하거나 새로 추가하세요';
+    toast('삭제됐어요', 'success');
+    await loadCountries();
+  } catch(e){
+    toast('삭제 실패: ' + e.message, 'error');
+  }
+}
+
+// ── 유틸 ─────────────────────────────────────────
+function escHtml(str){
+  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+function toast(msg, type='success'){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = `show ${type}`;
+  setTimeout(()=>el.className='', 3000);
+}
+
+// ── 초기화 ────────────────────────────────────────
+loadCountries();
+</script>
+</body>
+</html>
