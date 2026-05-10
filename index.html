@@ -169,7 +169,7 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
     </div>
     <div id="bbar">
       <span class="bs"><i class="ti ti-world" style="font-size:12px;"></i>&nbsp;전체 <span class="bv">195개국</span></span>
-      <span class="bs">데이터 보유 <span class="bv g">3개국</span></span>
+      <span class="bs">데이터 보유 <span class="bv g" id="data-count">로딩 중...</span></span>
       <span class="bs" style="margin-left:auto;">수능 세계지리 · 평가원 기출 기반</span>
     </div>
   </div>
@@ -204,7 +204,37 @@ const REGION_BOUNDS={
   oceania:{center:[150,-25],scale:300}
 };
 
-const DB={
+
+// ── Supabase 설정 ──────────────────────────────────────
+const SUPABASE_URL = 'https://jvkpxuvpjiyueefakkow.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2a3B4dXZwaml5dWVlZmFra293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjY0MjAsImV4cCI6MjA5MzkwMjQyMH0.DBhR0RK79LNqMud6dUEWiW3RUzuDGBVLr0Ohd773a9c';
+
+async function fetchCountries() {
+  try {
+    const res = await fetch(SUPABASE_URL + '/rest/v1/countries?select=*', {
+      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
+    });
+    if (!res.ok) return [];
+    return await res.json();
+  } catch(e) { return []; }
+}
+
+function parseCountry(row) {
+  return {
+    flag: row.flag || '🌍',
+    kr: row.name_kr || row.name_en,
+    en: row.name_en,
+    region: row.region || '',
+    desc: row.description || '',
+    searchTags: row.search_tags ? row.search_tags.split(',').map(t => t.trim().toLowerCase()) : [row.name_en.toLowerCase()],
+    cats: row.categories || []
+  };
+}
+
+
+let DB = {}; // Supabase에서 동적 로드
+// 기존 샘플 데이터 (Supabase 연동 전 fallback)
+const FALLBACK_DB={
   "Brazil":{flag:"🇧🇷",kr:"브라질",en:"Brazil",region:"samerica",desc:"남아메리카 최대 국가. 아마존 열대우림과 광대한 브라질 고원이 특징.",searchTags:["브라질","brazil","af","aw","cfa","열대우림","사바나","포르투갈어","커피","대두","itcz"],cats:[
     {id:"climate",ic:"ti-cloud",t:"기후",keywords:[
       {k:"Af 열대우림",d:"아마존 유역 전반. 연중 고온다습, 최냉월 18℃ 이상. 적도수렴대(ITCZ) 영향으로 연중 강수."},
@@ -330,7 +360,9 @@ const DB={
   ]}
 };
 
-const IDS={"076":"Brazil","682":"Saudi Arabia","566":"Nigeria"};
+const NUMERIC_IDS={"004":"Afghanistan","012":"Algeria","024":"Angola","032":"Argentina","036":"Australia","050":"Bangladesh","056":"Belgium","068":"Bolivia","076":"Brazil","116":"Cambodia","120":"Cameroon","124":"Canada","152":"Chile","156":"China","170":"Colombia","192":"Cuba","208":"Denmark","818":"Egypt","231":"Ethiopia","246":"Finland","250":"France","276":"Germany","288":"Ghana","300":"Greece","356":"India","360":"Indonesia","364":"Iran","368":"Iraq","376":"Israel","380":"Italy","392":"Japan","400":"Jordan","404":"Kenya","410":"South Korea","418":"Laos","434":"Libya","458":"Malaysia","484":"Mexico","504":"Morocco","528":"Netherlands","554":"New Zealand","566":"Nigeria","578":"Norway","586":"Pakistan","604":"Peru","608":"Philippines","616":"Poland","620":"Portugal","642":"Romania","643":"Russia","682":"Saudi Arabia","710":"South Africa","724":"Spain","752":"Sweden","756":"Switzerland","760":"Syria","764":"Thailand","788":"Tunisia","792":"Turkey","804":"Ukraine","784":"United Arab Emirates","826":"United Kingdom","840":"United States of America","858":"Uruguay","862":"Venezuela","704":"Vietnam","887":"Yemen"};
+let IDS = {"076":"Brazil","682":"Saudi Arabia","566":"Nigeria"};
+function buildIDS(){IDS={};Object.keys(DB).forEach(nameEn=>{const numId=Object.keys(NUMERIC_IDS).find(k=>NUMERIC_IDS[k]===nameEn);if(numId)IDS[numId]=nameEn;});}
 const MARKER_COLORS={landform:"#58a6ff",resource:"#d29922",conflict:"#f85149",city:"#3fb950"};
 let selEl=null,svgEl,gEl,markerG,pathFn,zoomBehavior,proj;
 let activeMarkers=[];
@@ -530,7 +562,22 @@ document.getElementById("sinput").addEventListener("input",function(){
   }
 });
 
-d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json").then(world=>{
+async function init(){
+  // Supabase에서 데이터 로드
+  const rows = await fetchCountries();
+  if(rows.length > 0){
+    DB = {};
+    rows.forEach(row => { DB[row.name_en] = parseCountry(row); });
+    buildIDS();
+    document.getElementById('data-count').textContent = Object.keys(DB).length + '개국';
+  } else {
+    // fallback: 기존 샘플 데이터 사용
+    DB = FALLBACK_DB;
+    buildIDS();
+  }
+
+  const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
+  {
   svgEl=d3.select("#world-svg");
   gEl=d3.select("#map-g");
   markerG=d3.select("#marker-g");
