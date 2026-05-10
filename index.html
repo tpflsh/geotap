@@ -577,7 +577,6 @@ async function init(){
   }
 
   const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
-  {
   svgEl=d3.select("#world-svg");
   gEl=d3.select("#map-g");
   markerG=d3.select("#marker-g");
