@@ -6,10 +6,21 @@
 <title>GeoTap — 수능 세계지리 학습 대시보드</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
 <style>
-:root{--bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#2d333b;--accent:#2ea043;--accent2:#3fb950;--t1:#e6edf3;--t2:#8b949e;--t3:#484f58;--bdr:rgba(255,255,255,0.08);--amber:#d29922;--amberBg:rgba(210,153,34,0.12);--amberBdr:rgba(210,153,34,0.25);--blue:#58a6ff;--blueBg:rgba(88,166,255,0.1);--red:#f85149;}
+:root{
+  --bg0:#0d1117;--bg1:#161b22;--bg2:#21262d;--bg3:#2d333b;
+  --accent:#2ea043;--accent2:#3fb950;
+  --t1:#e6edf3;--t2:#8b949e;--t3:#484f58;
+  --bdr:rgba(255,255,255,0.08);
+  --amber:#d29922;--amberBg:rgba(210,153,34,0.12);--amberBdr:rgba(210,153,34,0.25);
+  --blue:#58a6ff;--blueBg:rgba(88,166,255,0.1);--blueBdr:rgba(88,166,255,0.25);
+  --red:#f85149;--redBg:rgba(248,81,73,0.1);
+  --teal:#39d353;--tealBg:rgba(57,211,83,0.1);
+}
 *{box-sizing:border-box;margin:0;padding:0;}
 body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Apple SD Gothic Neo','Malgun Gothic',sans-serif;}
 #gt{background:var(--bg0);border-radius:12px;color:var(--t1);height:680px;width:100%;max-width:1200px;display:flex;overflow:hidden;}
+
+/* 좌측 nav */
 #nav{width:52px;background:var(--bg1);border-right:1px solid var(--bdr);display:flex;flex-direction:column;align-items:center;padding:14px 0;gap:6px;flex-shrink:0;z-index:10;}
 .nlogo{width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#fff;margin-bottom:10px;line-height:1.2;text-align:center;}
 .nbtn{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--t2);font-size:18px;border:none;background:none;position:relative;}
@@ -17,6 +28,8 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 .nbtn.on{color:var(--accent2);}
 .nbtn-label{position:absolute;left:46px;background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:4px 8px;font-size:11px;color:var(--t1);white-space:nowrap;display:none;z-index:100;}
 .nbtn:hover .nbtn-label{display:block;}
+
+/* 메인 */
 #main{flex:1;display:flex;flex-direction:column;overflow:hidden;position:relative;}
 #topbar{height:44px;background:var(--bg1);border-bottom:1px solid var(--bdr);display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0;z-index:5;}
 #tb-title{font-size:13px;font-weight:500;}
@@ -25,6 +38,8 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 #sbox{margin-left:auto;background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;display:flex;align-items:center;padding:0 10px;gap:6px;height:28px;}
 #sbox input{background:none;border:none;outline:none;color:var(--t1);font-size:12px;width:200px;}
 #sbox input::placeholder{color:var(--t3);}
+
+/* 지도 뷰 */
 #map-view{flex:1;display:flex;flex-direction:column;overflow:hidden;}
 #conflict-view{flex:1;display:none;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--t3);}
 #map-area{flex:1;position:relative;overflow:hidden;}
@@ -45,6 +60,8 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 .zbtn:hover{background:var(--bg3);color:var(--t1);}
 #legend{position:absolute;bottom:12px;left:12px;background:rgba(13,17,23,0.9);border:1px solid var(--bdr);border-radius:6px;padding:6px 12px;font-size:11px;color:var(--t2);display:flex;align-items:center;gap:10px;z-index:4;}
 .ldot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0;}
+
+/* 사이드 패널 */
 #panel{position:absolute;top:0;right:0;width:320px;height:100%;background:var(--bg1);border-left:1px solid var(--bdr);display:flex;flex-direction:column;transform:translateX(100%);transition:transform 0.35s cubic-bezier(.4,0,.2,1);z-index:6;}
 #panel.open{transform:translateX(0);}
 #ph{padding:14px 14px 12px;border-bottom:1px solid var(--bdr);flex-shrink:0;}
@@ -53,40 +70,65 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 #c-flag{font-size:26px;line-height:1;}
 #c-name{font-size:16px;font-weight:500;line-height:1.2;}
 #c-en{font-size:11px;color:var(--t2);margin-top:2px;}
+#ph-actions{display:flex;align-items:center;gap:6px;}
 #close-btn{width:28px;height:28px;border-radius:6px;background:none;border:1px solid var(--bdr);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
 #close-btn:hover{background:var(--bg3);}
-#c-desc{font-size:12px;color:var(--t2);line-height:1.65;}
-#cats{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:5px;min-height:0;}
+
+/* 챗봇 버튼 */
+#chat-btn{display:flex;align-items:center;gap:5px;padding:4px 10px;height:28px;border-radius:6px;background:var(--blueBg);border:1px solid var(--blueBdr);color:var(--blue);font-size:11px;font-weight:500;cursor:pointer;white-space:nowrap;font-family:inherit;}
+#chat-btn:hover{background:rgba(88,166,255,0.18);}
+#chat-btn i{font-size:12px;}
+
+#c-desc{font-size:12px;color:var(--t2);line-height:1.65;margin-top:4px;}
+
+/* 카테고리 영역 */
+#cats{flex:1;overflow-y:auto;padding:10px;display:flex;flex-direction:column;gap:6px;min-height:0;}
 #cats::-webkit-scrollbar{width:3px;}
 #cats::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px;}
-.cc{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;overflow:hidden;flex-shrink:0;}
-.ch{display:flex;align-items:center;gap:8px;padding:9px 12px;cursor:pointer;user-select:none;}
-.ch:hover{background:var(--bg3);}
-.ci{font-size:14px;color:var(--t2);width:16px;text-align:center;}
-.ct{font-size:12px;font-weight:500;flex:1;}
-.cv{font-size:11px;color:var(--t3);transition:transform 0.2s;}
-.ch.open .cv{transform:rotate(180deg);}
-.cb{display:none;padding:10px 12px 12px;border-top:1px solid var(--bdr);}
-.cb.open{display:block;}
-.kw-wrap{display:flex;flex-wrap:wrap;gap:5px;}
-.kw-tag{display:inline-flex;align-items:center;gap:4px;padding:4px 10px;border-radius:20px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t1);font-size:11px;cursor:pointer;transition:all 0.15s;}
-.kw-tag:hover{border-color:var(--accent);color:var(--accent2);}
-.kw-tag.active{border-color:var(--accent);background:rgba(46,160,67,0.12);color:var(--accent2);}
-.kw-tag.has-loc{border-color:rgba(88,166,255,0.25);}
-.kw-tag.has-loc:hover,.kw-tag.has-loc.active{border-color:var(--blue);color:var(--blue);background:var(--blueBg);}
-.kw-desc{margin-top:8px;padding:8px 10px;background:var(--bg0);border-radius:6px;border:1px solid var(--bdr);font-size:12px;color:var(--t2);line-height:1.7;display:none;}
-.kw-desc.open{display:block;}
-.loc-hint{display:flex;align-items:center;gap:3px;font-size:10px;color:var(--blue);margin-top:5px;}
-.exam-card{background:var(--amberBg);border:1px solid var(--amberBdr);border-radius:8px;overflow:hidden;flex-shrink:0;}
-.exam-card .ch:hover{background:rgba(210,153,34,0.08);}
-.exam-body{display:none;padding:10px 12px 12px;border-top:1px solid var(--amberBdr);}
-.exam-body.open{display:flex;flex-direction:column;gap:8px;}
-.exam-item{background:var(--bg1);border:1px solid var(--bdr);border-radius:6px;padding:8px 10px;}
-.exam-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;margin-bottom:6px;}
-.exam-item-text{font-size:12px;color:var(--t1);line-height:1.6;flex:1;}
-.exam-tags{display:flex;flex-wrap:wrap;gap:4px;}
-.exam-year-tag{font-size:10px;padding:2px 6px;border-radius:4px;background:var(--blueBg);border:1px solid rgba(88,166,255,0.2);color:var(--blue);}
-.bichul-badge{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(248,81,73,0.12);border:1px solid rgba(248,81,73,0.25);color:var(--red);font-weight:500;white-space:nowrap;}
+
+/* 기출(KICE) 카드 — 황금 */
+.kice-card{background:var(--amberBg);border:1px solid var(--amberBdr);border-radius:8px;overflow:hidden;flex-shrink:0;}
+.kice-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;}
+.kice-head:hover{background:rgba(210,153,34,0.08);}
+.kice-head .ch-icon{font-size:14px;color:var(--amber);}
+.kice-head .ch-title{font-size:12px;font-weight:600;color:var(--amber);flex:1;}
+.kice-head .ch-count{font-size:10px;color:rgba(210,153,34,0.6);}
+.kice-head .ch-chev{font-size:11px;color:var(--amber);opacity:0.6;transition:transform 0.2s;}
+.kice-head.open .ch-chev{transform:rotate(180deg);}
+.kice-body{display:none;padding:8px 10px 10px;border-top:1px solid var(--amberBdr);display:flex;flex-direction:column;gap:6px;}
+.kice-body.open{display:flex;}
+
+.kice-item{background:var(--bg1);border:1px solid var(--bdr);border-radius:6px;padding:9px 10px;}
+.kice-item-top{display:flex;align-items:flex-start;gap:8px;margin-bottom:6px;}
+.kice-item-text{font-size:12px;color:var(--t1);line-height:1.65;flex:1;}
+.kice-badges{display:flex;align-items:center;gap:4px;flex-shrink:0;}
+.badge-bichul{font-size:10px;padding:2px 6px;border-radius:4px;background:var(--redBg);border:1px solid rgba(248,81,73,0.25);color:var(--red);font-weight:600;white-space:nowrap;}
+.badge-imp{font-size:10px;padding:2px 6px;border-radius:4px;white-space:nowrap;font-weight:600;}
+.badge-imp.i3{background:rgba(210,153,34,0.15);border:1px solid rgba(210,153,34,0.3);color:var(--amber);}
+.badge-imp.i2{background:rgba(88,166,255,0.1);border:1px solid rgba(88,166,255,0.2);color:var(--blue);}
+.badge-imp.i1{background:var(--bg3);border:1px solid var(--bdr);color:var(--t3);}
+.kice-tags{display:flex;flex-wrap:wrap;gap:4px;}
+.kice-year-tag{font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(88,166,255,0.08);border:1px solid rgba(88,166,255,0.15);color:#7db8f7;}
+
+/* EBS 카드 — 청록 */
+.ebs-card{background:rgba(57,211,83,0.06);border:1px solid rgba(57,211,83,0.2);border-radius:8px;overflow:hidden;flex-shrink:0;}
+.ebs-head{display:flex;align-items:center;gap:8px;padding:10px 12px;cursor:pointer;user-select:none;}
+.ebs-head:hover{background:rgba(57,211,83,0.05);}
+.ebs-head .ch-icon{font-size:14px;color:var(--teal);}
+.ebs-head .ch-title{font-size:12px;font-weight:600;color:var(--teal);flex:1;}
+.ebs-head .ch-count{font-size:10px;color:rgba(57,211,83,0.5);}
+.ebs-head .ch-chev{font-size:11px;color:var(--teal);opacity:0.6;transition:transform 0.2s;}
+.ebs-head.open .ch-chev{transform:rotate(180deg);}
+.ebs-body{display:none;padding:8px 10px 10px;border-top:1px solid rgba(57,211,83,0.2);flex-direction:column;gap:6px;}
+.ebs-body.open{display:flex;}
+
+.ebs-item{background:var(--bg1);border:1px solid var(--bdr);border-radius:6px;padding:9px 10px;}
+.ebs-item-label{font-size:10px;color:var(--teal);font-weight:600;margin-bottom:4px;display:flex;align-items:center;gap:4px;}
+.ebs-item-label i{font-size:10px;}
+.ebs-item-text{font-size:12px;color:var(--t1);line-height:1.65;}
+.ebs-source-tag{display:inline-flex;align-items:center;gap:3px;font-size:10px;padding:2px 7px;border-radius:4px;background:rgba(57,211,83,0.08);border:1px solid rgba(57,211,83,0.15);color:rgba(57,211,83,0.8);margin-top:6px;}
+
+/* 대륙 카드 */
 .continent-card{background:var(--bg2);border:1px solid var(--bdr);border-radius:8px;padding:12px;flex-shrink:0;}
 .continent-title{font-size:13px;font-weight:500;margin-bottom:8px;color:var(--t1);}
 .continent-issues{font-size:12px;color:var(--t2);line-height:1.7;margin-bottom:12px;}
@@ -97,10 +139,44 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 .top5-flag{font-size:16px;}
 .top5-name{font-size:12px;flex:1;}
 .top5-count{font-size:11px;color:var(--amber);}
+
+/* 준비중 */
+.empty-panel{display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:10px;color:var(--t3);font-size:13px;text-align:center;}
+.empty-panel i{font-size:28px;}
+
+/* 하단바 */
 #bbar{height:36px;background:var(--bg1);border-top:1px solid var(--bdr);display:flex;align-items:center;padding:0 16px;gap:16px;flex-shrink:0;font-size:11px;color:var(--t3);z-index:5;}
 .bs{display:flex;align-items:center;gap:4px;}
 .bv{color:var(--t2);font-weight:500;}
 .bv.g{color:var(--accent2);}
+
+/* 챗봇 모달 */
+#chat-modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:100;display:none;align-items:center;justify-content:center;}
+#chat-modal.open{display:flex;}
+#chat-box{background:var(--bg1);border:1px solid var(--bdr);border-radius:12px;width:480px;height:560px;display:flex;flex-direction:column;overflow:hidden;}
+#chat-header{padding:14px 16px;border-bottom:1px solid var(--bdr);display:flex;align-items:center;gap:10px;flex-shrink:0;}
+#chat-header-flag{font-size:20px;}
+#chat-header-info{flex:1;}
+#chat-header-title{font-size:13px;font-weight:500;}
+#chat-header-sub{font-size:11px;color:var(--t2);}
+#chat-close{width:28px;height:28px;border-radius:6px;background:none;border:1px solid var(--bdr);color:var(--t2);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;}
+#chat-close:hover{background:var(--bg3);}
+#chat-messages{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;}
+#chat-messages::-webkit-scrollbar{width:3px;}
+#chat-messages::-webkit-scrollbar-thumb{background:var(--bg3);border-radius:4px;}
+.msg{max-width:85%;font-size:12px;line-height:1.7;padding:8px 12px;border-radius:8px;}
+.msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-radius:8px 8px 2px 8px;}
+.msg.bot{align-self:flex-start;background:var(--bg2);color:var(--t1);border:1px solid var(--bdr);border-radius:8px 8px 8px 2px;}
+.msg.bot.loading{color:var(--t3);}
+#chat-input-area{padding:12px;border-top:1px solid var(--bdr);display:flex;gap:8px;flex-shrink:0;}
+#chat-input{flex:1;background:var(--bg2);border:1px solid var(--bdr);border-radius:6px;padding:8px 12px;color:var(--t1);font-size:12px;font-family:inherit;outline:none;resize:none;height:36px;line-height:1.5;}
+#chat-input:focus{border-color:var(--blue);}
+#chat-send{width:36px;height:36px;background:var(--blue);border:none;border-radius:6px;color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+#chat-send:hover{background:#79b8ff;}
+#chat-send:disabled{background:var(--bg3);cursor:not-allowed;}
+.chat-suggestions{display:flex;flex-wrap:wrap;gap:5px;margin-top:4px;}
+.chat-sugg{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--bdr);background:var(--bg3);color:var(--t2);cursor:pointer;white-space:nowrap;}
+.chat-sugg:hover{border-color:var(--blue);color:var(--blue);}
 </style>
 </head>
 <body>
@@ -118,6 +194,7 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
     <div style="flex:1;"></div>
     <button class="nbtn"><i class="ti ti-settings"></i><span class="nbtn-label">설정</span></button>
   </div>
+
   <div id="main">
     <div id="topbar">
       <span id="tb-title">GeoTap</span>
@@ -125,9 +202,10 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
       <span id="tb-sub">세계 지도 탐색</span>
       <div id="sbox">
         <i class="ti ti-search" style="font-size:13px;color:#484f58;"></i>
-        <input placeholder="국가명, 키워드, 기후유형 검색..." id="sinput"/>
+        <input placeholder="국가명, 키워드 검색..." id="sinput"/>
       </div>
     </div>
+
     <div id="map-view">
       <div id="map-area">
         <div id="toolbar">
@@ -150,11 +228,21 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
           <span class="ldot" style="background:#1a3a5c;"></span>준비 중
           <span class="ldot" style="background:#3fb950;"></span>선택됨
         </div>
+
+        <!-- 사이드 패널 -->
         <div id="panel">
           <div id="ph">
             <div id="ph-top">
-              <div id="ph-left"><span id="c-flag"></span><div><div id="c-name"></div><div id="c-en"></div></div></div>
-              <button id="close-btn" aria-label="닫기"><i class="ti ti-x"></i></button>
+              <div id="ph-left">
+                <span id="c-flag"></span>
+                <div><div id="c-name"></div><div id="c-en"></div></div>
+              </div>
+              <div id="ph-actions">
+                <button id="chat-btn" onclick="openChat()">
+                  <i class="ti ti-message-circle"></i> AI에게 물어보기
+                </button>
+                <button id="close-btn" aria-label="닫기"><i class="ti ti-x"></i></button>
+              </div>
             </div>
             <div id="c-desc"></div>
           </div>
@@ -162,11 +250,13 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
         </div>
       </div>
     </div>
+
     <div id="conflict-view">
       <i class="ti ti-sword" style="font-size:48px;color:var(--t3);"></i>
       <div style="font-size:16px;font-weight:500;color:var(--t2);">분쟁지도</div>
-      <div style="font-size:13px;color:var(--t3);text-align:center;line-height:1.7;">전 세계 분쟁을 한눈에 볼 수 있는<br>분쟁지도를 준비 중이에요.<br>빠르게 업데이트할게요!</div>
+      <div style="font-size:13px;color:var(--t3);text-align:center;line-height:1.7;">전 세계 분쟁을 한눈에 볼 수 있는<br>분쟁지도를 준비 중이에요.</div>
     </div>
+
     <div id="bbar">
       <span class="bs"><i class="ti ti-world" style="font-size:12px;"></i>&nbsp;전체 <span class="bv">195개국</span></span>
       <span class="bs">데이터 보유 <span class="bv g" id="data-count">로딩 중...</span></span>
@@ -175,9 +265,29 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
   </div>
 </div>
 
+<!-- 챗봇 모달 -->
+<div id="chat-modal">
+  <div id="chat-box">
+    <div id="chat-header">
+      <span id="chat-header-flag">🌍</span>
+      <div id="chat-header-info">
+        <div id="chat-header-title">AI 지리 도우미</div>
+        <div id="chat-header-sub">기본 정보, 기후, 지형 등 무엇이든 물어보세요</div>
+      </div>
+      <button id="chat-close" onclick="closeChat()"><i class="ti ti-x"></i></button>
+    </div>
+    <div id="chat-messages"></div>
+    <div id="chat-input-area">
+      <textarea id="chat-input" placeholder="질문을 입력하세요..." rows="1"></textarea>
+      <button id="chat-send" onclick="sendChat()"><i class="ti ti-send"></i></button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <script>
+// ── 뷰 전환 ──────────────────────────────────────
 function switchView(v){
   document.getElementById('map-view').style.display=v==='map'?'flex':'none';
   document.getElementById('conflict-view').style.display=v==='conflict'?'flex':'none';
@@ -186,10 +296,11 @@ function switchView(v){
   document.getElementById('tb-sub').textContent=v==='map'?'세계 지도 탐색':'분쟁지도';
 }
 
+// ── 대륙 데이터 ───────────────────────────────────
 const CONTINENTS={
   asia:{name:"아시아",issues:"중동의 종교·자원 분쟁, 동남아시아 해양 영토 갈등, 카슈미르 분쟁 등 다양한 갈등이 공존. 인구 과밀과 급속한 도시화, 물 부족 문제도 핵심 이슈.",top5:[{flag:"🇸🇦",kr:"사우디아라비아",en:"Saudi Arabia",count:"47회"},{flag:"🇮🇳",kr:"인도",en:"India",count:"38회"},{flag:"🇨🇳",kr:"중국",en:"China",count:"35회"},{flag:"🇯🇵",kr:"일본",en:"Japan",count:"29회"},{flag:"🇮🇷",kr:"이란",en:"Iran",count:"21회"}]},
   europe:{name:"유럽",issues:"EU 통합과 브렉시트 이후 유럽 분열 우려, 러시아-우크라이나 전쟁, 난민·이민 문제, 저출산·고령화에 따른 인구 감소가 주요 이슈.",top5:[{flag:"🇩🇪",kr:"독일",en:"Germany",count:"32회"},{flag:"🇫🇷",kr:"프랑스",en:"France",count:"28회"},{flag:"🇬🇧",kr:"영국",en:"UK",count:"24회"},{flag:"🇷🇺",kr:"러시아",en:"Russia",count:"22회"},{flag:"🇳🇱",kr:"네덜란드",en:"Netherlands",count:"15회"}]},
-  africa:{name:"아프리카",issues:"사헬 지대 사막화와 식량 부족, 다민족·다종교 국가의 내전과 분리독립 운동, 자원의 저주, 에이즈 등 보건 문제, 급격한 인구 증가.",top5:[{flag:"🇳🇬",kr:"나이지리아",en:"Nigeria",count:"41회"},{flag:"🇪🇬",kr:"이집트",en:"Egypt",count:"33회"},{flag:"🇿🇦",kr:"남아프리카",en:"South Africa",count:"27회"},{flag:"🇰🇪",kr:"케냐",en:"Kenya",count:"19회"},{flag:"🇨🇩",kr:"콩고민주공화국",en:"DR Congo",count:"16회"}]},
+  africa:{name:"아프리카",issues:"사헬 지대 사막화와 식량 부족, 다민족·다종교 국가의 내전과 분리독립 운동, 자원의 저주, 급격한 인구 증가.",top5:[{flag:"🇳🇬",kr:"나이지리아",en:"Nigeria",count:"41회"},{flag:"🇪🇬",kr:"이집트",en:"Egypt",count:"33회"},{flag:"🇿🇦",kr:"남아프리카",en:"South Africa",count:"27회"},{flag:"🇰🇪",kr:"케냐",en:"Kenya",count:"19회"},{flag:"🇨🇩",kr:"콩고민주공화국",en:"DR Congo",count:"16회"}]},
   namerica:{name:"북미",issues:"멕시코-미국 국경 이민 문제, 카리브해 도서국의 기후변화 취약성, 원주민 권리 문제, USMCA 체제 내 경제 불균형.",top5:[{flag:"🇺🇸",kr:"미국",en:"USA",count:"45회"},{flag:"🇲🇽",kr:"멕시코",en:"Mexico",count:"31회"},{flag:"🇨🇦",kr:"캐나다",en:"Canada",count:"18회"},{flag:"🇨🇺",kr:"쿠바",en:"Cuba",count:"12회"},{flag:"🇭🇹",kr:"아이티",en:"Haiti",count:"9회"}]},
   samerica:{name:"남미",issues:"아마존 열대우림 파괴와 탄소 배출, 자원 수출 의존형 경제 구조, 빈부격차와 도시 슬럼화, 마약 카르텔 문제.",top5:[{flag:"🇧🇷",kr:"브라질",en:"Brazil",count:"52회"},{flag:"🇦🇷",kr:"아르헨티나",en:"Argentina",count:"28회"},{flag:"🇨🇱",kr:"칠레",en:"Chile",count:"22회"},{flag:"🇵🇪",kr:"페루",en:"Peru",count:"17회"},{flag:"🇨🇴",kr:"콜롬비아",en:"Colombia",count:"14회"}]},
   oceania:{name:"오세아니아",issues:"태평양 도서국의 해수면 상승과 수몰 위기, 산호초 백화현상, 원주민(애버리지니·마오리) 권리 문제, 중국의 태평양 영향력 확대.",top5:[{flag:"🇦🇺",kr:"호주",en:"Australia",count:"38회"},{flag:"🇳🇿",kr:"뉴질랜드",en:"New Zealand",count:"21회"},{flag:"🇵🇬",kr:"파푸아뉴기니",en:"Papua New Guinea",count:"12회"},{flag:"🇫🇯",kr:"피지",en:"Fiji",count:"8회"},{flag:"🇸🇧",kr:"솔로몬 제도",en:"Solomon Islands",count:"5회"}]}
@@ -204,227 +315,156 @@ const REGION_BOUNDS={
   oceania:{center:[150,-25],scale:300}
 };
 
+// ── Supabase ──────────────────────────────────────
+const SUPABASE_URL='https://jvkpxuvpjiyueefakkow.supabase.co';
+const SUPABASE_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2a3B4dXZwaml5dWVlZmFra293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjY0MjAsImV4cCI6MjA5MzkwMjQyMH0.DBhR0RK79LNqMud6dUEWiW3RUzuDGBVLr0Ohd773a9c';
 
-// ── Supabase 설정 ──────────────────────────────────────
-const SUPABASE_URL = 'https://jvkpxuvpjiyueefakkow.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp2a3B4dXZwaml5dWVlZmFra293Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzMjY0MjAsImV4cCI6MjA5MzkwMjQyMH0.DBhR0RK79LNqMud6dUEWiW3RUzuDGBVLr0Ohd773a9c';
-
-async function fetchCountries() {
-  try {
-    const res = await fetch(SUPABASE_URL + '/rest/v1/countries?select=*', {
-      headers: { 'apikey': SUPABASE_KEY, 'Authorization': 'Bearer ' + SUPABASE_KEY }
-    });
-    if (!res.ok) return [];
+async function fetchCountries(){
+  try{
+    const res=await fetch(SUPABASE_URL+'/rest/v1/countries?select=*',{headers:{'apikey':SUPABASE_KEY,'Authorization':'Bearer '+SUPABASE_KEY}});
+    if(!res.ok)return[];
     return await res.json();
-  } catch(e) { return []; }
+  }catch(e){return[];}
 }
 
-function parseCountry(row) {
-  return {
-    flag: row.flag || '🌍',
-    kr: row.name_kr || row.name_en,
-    en: row.name_en,
-    region: row.region || '',
-    desc: row.description || '',
-    searchTags: row.search_tags ? row.search_tags.split(',').map(t => t.trim().toLowerCase()) : [row.name_en.toLowerCase()],
-    cats: row.categories || []
+function parseCountry(row){
+  return{
+    flag:row.flag||'🌍',
+    kr:row.name_kr||row.name_en,
+    en:row.name_en,
+    region:row.region||'',
+    desc:row.description||'',
+    searchTags:row.search_tags?row.search_tags.split(',').map(t=>t.trim().toLowerCase()):[row.name_en.toLowerCase()],
+    cats:row.categories||[]
   };
 }
 
+let DB={};
 
-let DB = {}; // Supabase에서 동적 로드
-// 기존 샘플 데이터 (Supabase 연동 전 fallback)
-const FALLBACK_DB={
-  "Brazil":{flag:"🇧🇷",kr:"브라질",en:"Brazil",region:"samerica",desc:"남아메리카 최대 국가. 아마존 열대우림과 광대한 브라질 고원이 특징.",searchTags:["브라질","brazil","af","aw","cfa","열대우림","사바나","포르투갈어","커피","대두","itcz"],cats:[
-    {id:"climate",ic:"ti-cloud",t:"기후",keywords:[
-      {k:"Af 열대우림",d:"아마존 유역 전반. 연중 고온다습, 최냉월 18℃ 이상. 적도수렴대(ITCZ) 영향으로 연중 강수."},
-      {k:"Aw 사바나",d:"브라질 중부 세라도 지역. 건기·우기 뚜렷. ITCZ의 계절적 이동으로 여름 우기."},
-      {k:"Cfa 온대습윤",d:"브라질 남부. 연중 강수 고르고 겨울에도 영하로 내려가지 않음."},
-      {k:"ITCZ",d:"적도수렴대. 계절에 따라 남북으로 이동하며 아마존 강수량에 결정적 영향."}
-    ]},
-    {id:"landform",ic:"ti-mountain",t:"지형",type:"landform",keywords:[
-      {k:"브라질 고원",d:"브라질 국토 대부분을 차지하는 안정 지괴. 오래된 순상지 기반.",loc:[-15,-50]},
-      {k:"아마존 분지",d:"세계 최대 열대우림 분지. 아마존강 유역 광대한 저평야.",loc:[-3,-60]},
-      {k:"아마존강",d:"유량 세계 1위. 길이는 나일강에 이어 2위. 대서양으로 유입.",loc:[-3,-55]},
-      {k:"파라나강",d:"브라질 남부~아르헨티나 경유. 이타이푸 댐 위치.",loc:[-24,-54]}
-    ]},
-    {id:"religion",ic:"ti-building-church",t:"종교/언어",keywords:[
-      {k:"가톨릭",d:"전체 인구의 약 65%. 포르투갈 식민지배 영향."},
-      {k:"포르투갈어",d:"남아메리카 유일의 포르투갈어 공용국. 나머지 남미 국가는 스페인어 사용."},
-      {k:"혼혈사회",d:"유럽계·아프리카계·원주민 혼혈(메스티소·물라토) 비율 높음."}
-    ]},
-    {id:"population",ic:"ti-users",t:"인구/도시화",type:"city",keywords:[
-      {k:"약 2억 1천만 명",d:"남아메리카 최대 인구국. 세계 6~7위 수준."},
-      {k:"도시화율 87%+",d:"상파울루·리우 거대도시 집중. 급격한 도시화로 파벨라(빈민촌) 형성."},
-      {k:"상파울루",d:"남미 최대 도시. 인구 약 1,200만. 라틴아메리카 경제 중심.",loc:[-23.5,-46.6]}
-    ]},
-    {id:"resource",ic:"ti-bolt",t:"자원/산업",type:"resource",keywords:[
-      {k:"카라자스 철광산",d:"세계 최대급 철광산. 브라질 북부 파라주. 중국·일본 등으로 대량 수출.",loc:[-6,-50]},
-      {k:"이타이푸 댐",d:"브라질-파라과이 국경 파라나강. 세계 최대급 수력발전소.",loc:[-25.4,-54.6]},
-      {k:"프리-살 유전",d:"대서양 심해 암염층 아래 대규모 유전. 국영 페트로브라스가 개발.",loc:[-22,-41]}
-    ]},
-    {id:"agriculture",ic:"ti-plant",t:"농업",keywords:[
-      {k:"대두 세계 1위",d:"세라도 개발 이후 급성장. 미국과 함께 세계 대두 생산·수출 주도."},
-      {k:"커피 세계 1위",d:"상파울루주 일대 테라로샤(적색 화산토) 토양. 150년 이상 세계 최대 생산국."},
-      {k:"에탄올(바이오연료)",d:"세계 최대 사탕수수 생산국. 에탄올 생산 세계 1~2위. 프로알코올 정책."}
-    ]},
-    {id:"conflict",ic:"ti-alert-triangle",t:"분쟁/이슈 (국내)",type:"conflict",keywords:[
-      {k:"아마존 삼림벌채",d:"농지·목축지 확보를 위한 불법 벌채. CO₂ 흡수원 훼손, 생물다양성 감소.",loc:[-5,-63]},
-      {k:"파벨라",d:"급격한 도시화로 형성된 빈민촌. 리우·상파울루 산비탈 밀집. 치안 문제.",loc:[-22.9,-43.2]},
-      {k:"원주민 토지권",d:"아마존 원주민 보호구역을 둘러싼 정부·농업자본과의 갈등 지속.",loc:[-4,-62]}
-    ]},
-    {id:"integration",ic:"ti-circles-relation",t:"지역통합체",keywords:[
-      {k:"메르코수르",d:"남미공동시장. 브라질·아르헨티나·우루과이·파라과이. 역내 관세 철폐."},
-      {k:"BRICS",d:"브라질·러시아·인도·중국·남아공. 신흥경제국 협의체."}
-    ]},
-    {id:"exam",ic:"ti-star",t:"기출 포인트",isExam:true,points:[
-      {text:"남아메리카 유일 포르투갈어 사용국 (나머지는 스페인어)",tags:["24수능 19번","23수능 20번","22평가원9월 15번","21수능 18번"],bichul:true},
-      {text:"이타이푸 댐 = 브라질·파라과이 공동 운영, 수력발전",tags:["24평가원6월 17번","22수능 19번"],bichul:true},
-      {text:"아마존 열대우림 파괴 → CO₂ 증가, 생물다양성 감소",tags:["23평가원6월 13번","21평가원9월 14번"],bichul:false},
-      {text:"에탄올(바이오연료) 생산 세계 1~2위, 프로알코올 정책",tags:["23수능 17번"],bichul:false}
-    ]}
-  ]},
-  "Saudi Arabia":{flag:"🇸🇦",kr:"사우디아라비아",en:"Saudi Arabia",region:"asia",desc:"아라비아 반도 대부분을 차지. 이슬람 최대 성지와 세계 최대 원유 매장량 보유.",searchTags:["사우디","사우디아라비아","saudi","bwh","건조","사막","이슬람","메카","원유","opec"],cats:[
-    {id:"climate",ic:"ti-sun",t:"기후",keywords:[
-      {k:"BWh 열대사막",d:"전역 건조기후. 연강수량 100mm 미만. 여름 최고 50℃+. 일교차·연교차 극심."},
-      {k:"모래폭풍(하붑)",d:"봄·여름철 사막에서 발생하는 대규모 모래폭풍. 시정 제로 수준."}
-    ]},
-    {id:"landform",ic:"ti-mountain",t:"지형",type:"landform",keywords:[
-      {k:"헤자즈 산맥",d:"서부 홍해 연안 산맥. 해발 2,000m+. 메카·메디나 위치한 지역.",loc:[21,40]},
-      {k:"루브알할리",d:"세계 최대 연속 모래사막. 아라비아 반도 남부.",loc:[20,50]},
-      {k:"페르시아만 연안",d:"동부 저지대. 석유 매장 집중. 담수화 시설 다수 위치.",loc:[25,50]}
-    ]},
-    {id:"religion",ic:"ti-building-mosque",t:"종교/언어",keywords:[
-      {k:"이슬람(수니파) 국교",d:"전 국민 무슬림. 이슬람법(샤리아) 기반 통치."},
-      {k:"메카",d:"이슬람 최대 성지. 무함마드 탄생지. 비무슬림 입장 불가.",loc:[21.4,39.8]},
-      {k:"메디나",d:"이슬람 발상지. 무함마드 묘소 위치. 비무슬림 입장 불가.",loc:[24.5,39.6]},
-      {k:"하지(성지순례)",d:"이슬람 5대 의무 중 하나. 매년 200만+ 순례자 메카 방문."}
-    ]},
-    {id:"resource",ic:"ti-bolt",t:"자원/산업",type:"resource",keywords:[
-      {k:"가와르 유전",d:"세계 최대급 유전. 발견 이후 80년간 생산 지속.",loc:[25.9,49.1]},
-      {k:"OPEC 최대 산유국",d:"석유수출국기구 실질적 맹주. 감산·증산 결정에 세계 유가 직결."},
-      {k:"비전 2030",d:"왕세자 MBS 주도 탈석유 경제다각화 정책. 관광·엔터·제조업 육성."}
-    ]},
-    {id:"conflict",ic:"ti-alert-triangle",t:"분쟁/이슈 (국내)",type:"conflict",keywords:[
-      {k:"예멘 내전 개입",d:"2015년~ 사우디 주도 아랍연합군 개입. 후티 반군(이란 지원)과 내전.",loc:[15.6,48.5]},
-      {k:"카타르 단교",d:"2017~2021 사우디·UAE 등 카타르 단교. 이란·무슬림형제단 연계 의혹."}
-    ]},
-    {id:"integration",ic:"ti-circles-relation",t:"지역통합체",keywords:[
-      {k:"GCC(걸프협력회의)",d:"사우디·UAE·쿠웨이트·카타르·바레인·오만. 페르시아만 아랍 6개국 협의체."},
-      {k:"아랍연맹",d:"22개 아랍국가 연합. 이스라엘 대립, 역내 분쟁 조정 역할."}
-    ]},
-    {id:"exam",ic:"ti-star",t:"기출 포인트",isExam:true,points:[
-      {text:"메카·메디나 이슬람 최대 성지, 비무슬림 입장 불가",tags:["24수능 15번","23수능 14번","22수능 13번","21평가원6월 12번"],bichul:true},
-      {text:"OPEC 최대 산유국, 석유 수출 의존도 높음",tags:["24평가원9월 16번","22수능 17번"],bichul:true},
-      {text:"BWh 기후 — 연강수량 극히 적고 일교차·연교차 큼",tags:["23평가원6월 7번","21수능 8번"],bichul:false},
-      {text:"수니파 맹주 vs 이란(시아파) 대립 구도",tags:["24수능 18번","23수능 18번"],bichul:false}
-    ]}
-  ]},
-  "Nigeria":{flag:"🇳🇬",kr:"나이지리아",en:"Nigeria",region:"africa",desc:"아프리카 최대 인구국. 다민족·다종교 국가로 석유 자원과 복합 갈등이 공존.",searchTags:["나이지리아","nigeria","af","aw","bsh","열대우림","사바나","이슬람","기독교","석유","itcz"],cats:[
-    {id:"climate",ic:"ti-cloud",t:"기후",keywords:[
-      {k:"남부 Af·Am",d:"기니만 연안. 열대우림기후. 연중 고온다습. 연강수 2,000mm+."},
-      {k:"중부 Aw 사바나",d:"건기·우기 뚜렷. ITCZ 이동으로 여름 우기, 겨울 건기(하르마탄 바람)."},
-      {k:"북부 BSh 스텝",d:"사헬 지대. 반건조. 사막화 진행 중. 농업 한계지역."},
-      {k:"ITCZ 이동",d:"적도수렴대가 계절적으로 남북 이동. 나이지리아의 강수 패턴 결정."}
-    ]},
-    {id:"landform",ic:"ti-mountain",t:"지형",type:"landform",keywords:[
-      {k:"니제르강 삼각주",d:"기니만 유입부. 석유 개발 핵심 지역. 맹그로브 습지 발달.",loc:[5,6]},
-      {k:"조스 고원",d:"나이지리아 중부 고원. 서늘한 기후. 주석(틴) 광산 위치.",loc:[9.9,8.9]},
-      {k:"차드호",d:"나이지리아 북동부 접경. 기후변화·과잉 취수로 급격히 축소.",loc:[13.5,14]}
-    ]},
-    {id:"religion",ic:"ti-building-mosque",t:"종교/언어",keywords:[
-      {k:"북부 이슬람(수니파)",d:"하우사·풀라니족 중심. 샤리아법 도입 12개 북부 주. 인구 약 50%."},
-      {k:"남부 기독교",d:"이보·요루바족 중심. 가톨릭·개신교 혼재. 인구 약 40%."},
-      {k:"영어(공용어)",d:"영국 식민지배(1914~1960) 유산. 250+ 부족어 존재로 영어가 공통어 역할."}
-    ]},
-    {id:"resource",ic:"ti-bolt",t:"자원/산업",type:"resource",keywords:[
-      {k:"니제르강 삼각주 석유",d:"아프리카 최대 원유 생산 지역. Shell 등 다국적 기업 운영. 환경오염 심각.",loc:[5,6]},
-      {k:"OPEC 회원국",d:"아프리카 최대 산유국. 정제시설 부족으로 정제유 수입 역설."},
-      {k:"자원의 저주",d:"석유 수출 의존도 과다. 제조업 약화, 부패·빈부격차 심화."}
-    ]},
-    {id:"conflict",ic:"ti-alert-triangle",t:"분쟁/이슈 (국내)",type:"conflict",keywords:[
-      {k:"보코하람",d:"북부 이슬람 극단주의 무장단체. 납치·테러. 차드호 주변 활동.",loc:[11,13]},
-      {k:"비아프라 분리독립",d:"1967~70년 이보족 독립 시도. 내전으로 100만+ 희생. 현재도 잔존.",loc:[5.5,7.5]},
-      {k:"니제르 삼각주 갈등",d:"석유 개발 이익 배분 불만. 무장단체 파이프라인 폭파, 환경오염 피해 시위.",loc:[5,6]}
-    ]},
-    {id:"integration",ic:"ti-circles-relation",t:"지역통합체",keywords:[
-      {k:"아프리카연합(AU)",d:"55개 아프리카 국가 연합. 분쟁 조정·경제협력 역할."},
-      {k:"ECOWAS",d:"서아프리카경제공동체. 나이지리아가 경제적 주도국."}
-    ]},
-    {id:"exam",ic:"ti-star",t:"기출 포인트",isExam:true,points:[
-      {text:"아프리카 최대 원유 생산국, 니제르강 삼각주 석유 환경오염",tags:["24수능 16번","22평가원9월 14번","21수능 15번"],bichul:true},
-      {text:"북부 이슬람 vs 남부 기독교 → 종교·민족 복합 갈등",tags:["23수능 19번","22수능 18번"],bichul:true},
-      {text:"ITCZ 이동 → 남북 기후대 분포(Af→Aw→BSh)",tags:["24평가원6월 5번","23평가원9월 6번"],bichul:false},
-      {text:"보코하람 이슬람 극단주의 테러단체, 북부 활동",tags:["23수능 19번"],bichul:false}
-    ]}
-  ]}
-};
-
-const NUMERIC_IDS={"004":"Afghanistan","012":"Algeria","024":"Angola","032":"Argentina","036":"Australia","050":"Bangladesh","056":"Belgium","068":"Bolivia","076":"Brazil","116":"Cambodia","120":"Cameroon","124":"Canada","152":"Chile","156":"China","170":"Colombia","192":"Cuba","208":"Denmark","818":"Egypt","231":"Ethiopia","246":"Finland","250":"France","276":"Germany","288":"Ghana","300":"Greece","356":"India","360":"Indonesia","364":"Iran","368":"Iraq","376":"Israel","380":"Italy","392":"Japan","400":"Jordan","404":"Kenya","410":"South Korea","418":"Laos","434":"Libya","458":"Malaysia","484":"Mexico","504":"Morocco","528":"Netherlands","554":"New Zealand","566":"Nigeria","578":"Norway","586":"Pakistan","604":"Peru","608":"Philippines","616":"Poland","620":"Portugal","642":"Romania","643":"Russia","682":"Saudi Arabia","710":"South Africa","724":"Spain","752":"Sweden","756":"Switzerland","760":"Syria","764":"Thailand","788":"Tunisia","792":"Turkey","804":"Ukraine","784":"United Arab Emirates","826":"United Kingdom","840":"United States of America","858":"Uruguay","862":"Venezuela","704":"Vietnam","887":"Yemen"};
-let IDS = {"076":"Brazil","682":"Saudi Arabia","566":"Nigeria"};
+// ── 숫자 ID 매핑 ──────────────────────────────────
+const NUMERIC_IDS={"004":"Afghanistan","008":"Albania","012":"Algeria","024":"Angola","032":"Argentina","036":"Australia","040":"Austria","050":"Bangladesh","056":"Belgium","064":"Bhutan","068":"Bolivia","070":"Bosnia and Herzegovina","076":"Brazil","100":"Bulgaria","116":"Cambodia","120":"Cameroon","124":"Canada","144":"Sri Lanka","152":"Chile","156":"China","170":"Colombia","188":"Costa Rica","191":"Croatia","192":"Cuba","196":"Cyprus","203":"Czech Republic","208":"Denmark","218":"Ecuador","818":"Egypt","231":"Ethiopia","246":"Finland","250":"France","266":"Gabon","276":"Germany","288":"Ghana","300":"Greece","320":"Guatemala","332":"Haiti","340":"Honduras","348":"Hungary","356":"India","360":"Indonesia","364":"Iran","368":"Iraq","372":"Ireland","376":"Israel","380":"Italy","388":"Jamaica","392":"Japan","400":"Jordan","398":"Kazakhstan","404":"Kenya","408":"North Korea","410":"South Korea","414":"Kuwait","418":"Laos","422":"Lebanon","434":"Libya","442":"Luxembourg","458":"Malaysia","484":"Mexico","496":"Mongolia","504":"Morocco","508":"Mozambique","516":"Namibia","524":"Nepal","528":"Netherlands","554":"New Zealand","558":"Nicaragua","566":"Nigeria","578":"Norway","512":"Oman","586":"Pakistan","591":"Panama","604":"Peru","608":"Philippines","616":"Poland","620":"Portugal","630":"Puerto Rico","634":"Qatar","642":"Romania","643":"Russia","682":"Saudi Arabia","686":"Senegal","694":"Sierra Leone","706":"Somalia","710":"South Africa","728":"South Sudan","724":"Spain","729":"Sudan","752":"Sweden","756":"Switzerland","760":"Syria","762":"Tajikistan","764":"Thailand","768":"Togo","788":"Tunisia","792":"Turkey","800":"Uganda","804":"Ukraine","784":"United Arab Emirates","826":"United Kingdom","840":"United States of America","858":"Uruguay","860":"Uzbekistan","862":"Venezuela","704":"Vietnam","887":"Yemen","894":"Zambia","716":"Zimbabwe"};
+let IDS={};
 function buildIDS(){IDS={};Object.keys(DB).forEach(nameEn=>{const numId=Object.keys(NUMERIC_IDS).find(k=>NUMERIC_IDS[k]===nameEn);if(numId)IDS[numId]=nameEn;});}
-const MARKER_COLORS={landform:"#58a6ff",resource:"#d29922",conflict:"#f85149",city:"#3fb950"};
+
 let selEl=null,svgEl,gEl,markerG,pathFn,zoomBehavior,proj;
-let activeMarkers=[];
 
-function drawMarker(g,sx,sy,type,label){
-  const col=MARKER_COLORS[type]||"#58a6ff";
-  if(type==="landform"){
-    g.append("polygon").attr("points",`${sx},${sy-11} ${sx-8},${sy+6} ${sx+8},${sy+6}`).attr("fill",col).attr("stroke","#0d1117").attr("stroke-width",1.5);
-  } else if(type==="resource"){
-    g.append("circle").attr("cx",sx).attr("cy",sy).attr("r",8).attr("fill",col).attr("stroke","#0d1117").attr("stroke-width",1.5);
-  } else if(type==="conflict"){
-    g.append("circle").attr("cx",sx).attr("cy",sy).attr("r",10).attr("fill","none").attr("stroke",col).attr("stroke-width",2);
-    g.append("text").attr("x",sx).attr("y",sy+6).attr("text-anchor","middle").attr("font-size","14px").attr("fill",col).attr("font-weight","bold").text("!");
-  } else {
-    g.append("circle").attr("cx",sx).attr("cy",sy).attr("r",6).attr("fill",col).attr("stroke","#0d1117").attr("stroke-width",1.5);
+// ── 패널 렌더 ─────────────────────────────────────
+function renderPanel(name){
+  const d=DB[name];
+  document.getElementById('c-flag').textContent=d?d.flag:'🌍';
+  document.getElementById('c-name').textContent=d?d.kr:(name||'');
+  document.getElementById('c-en').textContent=d?d.en:'';
+  document.getElementById('c-desc').textContent=d?d.desc:'';
+
+  // 챗봇 버튼 — 국가 선택 시만 표시
+  const chatBtn=document.getElementById('chat-btn');
+  chatBtn.style.display=d?'flex':'none';
+
+  const cats=document.getElementById('cats');
+  cats.innerHTML='';
+
+  if(!d){
+    cats.innerHTML=`<div class="empty-panel"><i class="ti ti-clock"></i><span>아직 준비 중이에요.<br>곧 업데이트할게요!</span></div>`;
+    return;
   }
-  g.append("text").attr("x",sx+14).attr("y",sy+4).attr("fill","#e6edf3").style("font-size","11px").style("font-family","Apple SD Gothic Neo,sans-serif").attr("paint-order","stroke").attr("stroke","#0d1117").attr("stroke-width","3px").text(label);
+
+  // kice 카드
+  const kiceCat=d.cats.find(c=>c.id==='kice');
+  if(kiceCat&&kiceCat.points&&kiceCat.points.length>0){
+    const sortedPts=[...(kiceCat.points)].sort((a,b)=>(b.importance||0)-(a.importance||0));
+    const card=document.createElement('div');
+    card.className='kice-card';
+
+    const head=document.createElement('div');
+    head.className='kice-head';
+    head.innerHTML=`<i class="ti ti-star ch-icon"></i><span class="ch-title">기출 포인트</span><span class="ch-count">${sortedPts.length}개</span><i class="ti ti-chevron-down ch-chev"></i>`;
+
+    const body=document.createElement('div');
+    body.className='kice-body';
+
+    sortedPts.forEach(pt=>{
+      const item=document.createElement('div');
+      item.className='kice-item';
+
+      const impBadge=pt.importance===3?`<span class="badge-imp i3">최상</span>`:pt.importance===2?`<span class="badge-imp i2">상</span>`:pt.importance===1?`<span class="badge-imp i1">중</span>`:'';
+      const bichulBadge=pt.bichul?`<span class="badge-bichul">빈출</span>`:'';
+      const tagsHtml=(pt.tags||[]).map(t=>`<span class="kice-year-tag">${t}</span>`).join('');
+
+      item.innerHTML=`
+        <div class="kice-item-top">
+          <span class="kice-item-text">${pt.text}</span>
+          <div class="kice-badges">${impBadge}${bichulBadge}</div>
+        </div>
+        <div class="kice-tags">${tagsHtml}</div>
+      `;
+      body.appendChild(item);
+    });
+
+    head.addEventListener('click',()=>{head.classList.toggle('open');body.classList.toggle('open');});
+    card.appendChild(head);card.appendChild(body);
+    cats.appendChild(card);
+  }
+
+  // ebs 카드
+  const ebsCat=d.cats.find(c=>c.id==='ebs');
+  if(ebsCat&&ebsCat.points&&ebsCat.points.length>0){
+    const card=document.createElement('div');
+    card.className='ebs-card';
+
+    const head=document.createElement('div');
+    head.className='ebs-head';
+    head.innerHTML=`<i class="ti ti-book ch-icon"></i><span class="ch-title">EBS 연계</span><span class="ch-count">${ebsCat.points.length}개</span><i class="ti ti-chevron-down ch-chev"></i>`;
+
+    const body=document.createElement('div');
+    body.className='ebs-body';
+
+    ebsCat.points.forEach(pt=>{
+      const item=document.createElement('div');
+      item.className='ebs-item';
+      const srcTag=pt.source?`<span class="ebs-source-tag"><i class="ti ti-book-2"></i>${pt.source}</span>`:'';
+      item.innerHTML=`
+        <div class="ebs-item-label"><i class="ti ti-notebook"></i>${pt.title||'연계 내용'}</div>
+        <div class="ebs-item-text">${pt.text}</div>
+        ${srcTag}
+      `;
+      body.appendChild(item);
+    });
+
+    head.addEventListener('click',()=>{head.classList.toggle('open');body.classList.toggle('open');});
+    card.appendChild(head);card.appendChild(body);
+    cats.appendChild(card);
+  }
+
+  if((!kiceCat||!kiceCat.points||kiceCat.points.length===0)&&(!ebsCat||!ebsCat.points||ebsCat.points.length===0)){
+    cats.innerHTML=`<div class="empty-panel"><i class="ti ti-clock"></i><span>기출·EBS 데이터를<br>준비 중이에요.</span></div>`;
+  }
+
+  document.getElementById('panel').classList.add('open');
 }
 
-function clearMarkers(){markerG.selectAll("*").remove();activeMarkers=[];}
-
-function addMarker(lat,lon,label,type,transform){
-  const p=proj([lon,lat]);if(!p)return;
-  const k=transform?transform.k:1,tx=transform?transform.x:0,ty=transform?transform.y:0;
-  const sx=p[0]*k+tx,sy=p[1]*k+ty;
-  const g=markerG.append("g").attr("class","map-marker");
-  drawMarker(g,sx,sy,type,label);
-  activeMarkers.push({lat,lon,label,type});
-}
-
-function redrawMarkers(){
-  const t=d3.zoomTransform(svgEl.node());
-  markerG.selectAll("*").remove();
-  activeMarkers.forEach(m=>{
-    const p=proj([m.lon,m.lat]);if(!p)return;
-    const sx=p[0]*t.k+t.x,sy=p[1]*t.k+t.y;
-    const g=markerG.append("g").attr("class","map-marker");
-    drawMarker(g,sx,sy,m.type,m.label);
-  });
-}
-
+// ── 대륙 패널 ─────────────────────────────────────
 function renderContinent(region){
   const c=CONTINENTS[region];if(!c)return;
-  document.getElementById("c-flag").textContent="🗺️";
-  document.getElementById("c-name").textContent=c.name;
-  document.getElementById("c-en").textContent="대륙 개요";
-  document.getElementById("c-desc").textContent="";
-  const cats=document.getElementById("cats");
-  cats.innerHTML="";
-  const card=document.createElement("div");
-  card.className="continent-card";
+  document.getElementById('c-flag').textContent='🗺️';
+  document.getElementById('c-name').textContent=c.name;
+  document.getElementById('c-en').textContent='대륙 개요';
+  document.getElementById('c-desc').textContent='';
+  document.getElementById('chat-btn').style.display='none';
+  const cats=document.getElementById('cats');
+  cats.innerHTML='';
+  const card=document.createElement('div');
+  card.className='continent-card';
   card.innerHTML=`<div class="continent-title">주요 이슈</div><div class="continent-issues">${c.issues}</div><div class="top5-label">기출 빈도 Top 5</div>`;
   c.top5.forEach((item,i)=>{
-    const el=document.createElement("div");
-    el.className="top5-item";
+    const el=document.createElement('div');
+    el.className='top5-item';
     el.innerHTML=`<span class="top5-rank">${i+1}</span><span class="top5-flag">${item.flag}</span><span class="top5-name">${item.kr}</span><span class="top5-count">${item.count}</span>`;
-    el.addEventListener("click",()=>{
+    el.addEventListener('click',()=>{
       const match=Object.keys(DB).find(k=>DB[k].kr===item.kr||DB[k].en===item.en);
       if(match){
-        gEl.selectAll(".cp").each(function(d){
-          const id=String(d.id).padStart(3,"0");
-          if(IDS[id]===match){if(selEl)d3.select(selEl).classed("sel",false);selEl=this;d3.select(this).classed("sel",true);zoomToFeature(d);}
+        gEl.selectAll('.cp').each(function(d){
+          const id=String(d.id).padStart(3,'0');
+          if(IDS[id]===match){if(selEl)d3.select(selEl).classed('sel',false);selEl=this;d3.select(this).classed('sel',true);zoomToFeature(d);}
         });
         renderPanel(match);
       }
@@ -432,78 +472,14 @@ function renderContinent(region){
     card.appendChild(el);
   });
   cats.appendChild(card);
-  document.getElementById("panel").classList.add("open");
+  document.getElementById('panel').classList.add('open');
 }
 
-function renderPanel(name){
-  const d=DB[name];
-  document.getElementById("c-flag").textContent=d?d.flag:"🌍";
-  document.getElementById("c-name").textContent=d?d.kr:name;
-  document.getElementById("c-en").textContent=d?d.en:"";
-  document.getElementById("c-desc").textContent=d?d.desc:"";
-  const cats=document.getElementById("cats");
-  cats.innerHTML="";
-  clearMarkers();
-  if(!d){
-    cats.innerHTML=`<div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:200px;gap:10px;color:var(--t3);font-size:13px;text-align:center;"><i class="ti ti-clock" style="font-size:28px;"></i><span>아직 준비 중이에요.<br>곧 업데이트할게요!</span></div>`;
-    return;
-  }
-  d.cats.forEach(cat=>{
-    if(cat.isExam){
-      const card=document.createElement("div");card.className="exam-card";
-      const head=document.createElement("div");head.className="ch";
-      head.innerHTML=`<i class="ti ${cat.ic} ci" style="color:#e3b341;"></i><span class="ct" style="color:#e3b341;">${cat.t}</span><i class="ti ti-chevron-down cv"></i>`;
-      const body=document.createElement("div");body.className="exam-body";
-      cat.points.forEach(pt=>{
-        const item=document.createElement("div");item.className="exam-item";
-        const tagsHtml=pt.tags.map(t=>`<span class="exam-year-tag">${t}</span>`).join("");
-        const bichul=pt.bichul?`<span class="bichul-badge">빈출</span>`:"";
-        item.innerHTML=`<div class="exam-item-top"><span class="exam-item-text">${pt.text}</span>${bichul}</div><div class="exam-tags">${tagsHtml}</div>`;
-        body.appendChild(item);
-      });
-      head.addEventListener("click",()=>{head.classList.toggle("open");body.classList.toggle("open");});
-      card.appendChild(head);card.appendChild(body);cats.appendChild(card);
-    } else {
-      if(!cat.keywords||cat.keywords.length===0)return;
-      const card=document.createElement("div");card.className="cc";
-      const head=document.createElement("div");head.className="ch";
-      head.innerHTML=`<i class="ti ${cat.ic} ci"></i><span class="ct">${cat.t}</span><i class="ti ti-chevron-down cv"></i>`;
-      const body=document.createElement("div");body.className="cb";
-      const kwWrap=document.createElement("div");kwWrap.className="kw-wrap";
-      let activeTag=null,activeDesc=null;
-      cat.keywords.forEach(kw=>{
-        const tag=document.createElement("span");
-        tag.className="kw-tag"+(kw.loc?" has-loc":"");
-        tag.innerHTML=kw.loc?`<i class="ti ti-map-pin" style="font-size:10px;"></i>${kw.k}`:kw.k;
-        const desc=document.createElement("div");desc.className="kw-desc";
-        desc.innerHTML=kw.d+(kw.loc?`<div class="loc-hint"><i class="ti ti-map-pin" style="font-size:10px;"></i>지도에 위치 표시됨</div>`:"");
-        kwWrap.appendChild(tag);kwWrap.appendChild(desc);
-        tag.addEventListener("click",e=>{
-          e.stopPropagation();
-          const isActive=activeTag===tag;
-          if(activeTag){activeTag.classList.remove("active");activeDesc.classList.remove("open");}
-          clearMarkers();
-          if(!isActive){
-            tag.classList.add("active");desc.classList.add("open");activeTag=tag;activeDesc=desc;
-            if(kw.loc){const t=d3.zoomTransform(svgEl.node());addMarker(kw.loc[0],kw.loc[1],kw.k,cat.type||"city",t);}
-          } else {activeTag=null;activeDesc=null;}
-        });
-      });
-      body.appendChild(kwWrap);
-      head.addEventListener("click",()=>{
-        head.classList.toggle("open");body.classList.toggle("open");
-        if(!head.classList.contains("open")){clearMarkers();if(activeTag){activeTag.classList.remove("active");activeDesc.classList.remove("open");activeTag=null;activeDesc=null;}}
-      });
-      card.appendChild(head);card.appendChild(body);cats.appendChild(card);
-    }
-  });
-  document.getElementById("panel").classList.add("open");
-}
-
+// ── 줌 함수 ──────────────────────────────────────
 function zoomToFeature(feature){
-  const mapArea=document.getElementById("map-area");
+  const mapArea=document.getElementById('map-area');
   const W=mapArea.clientWidth,H=mapArea.clientHeight;
-  const panelOpen=document.getElementById("panel").classList.contains("open");
+  const panelOpen=document.getElementById('panel').classList.contains('open');
   const effectiveW=panelOpen?W-320:W;
   const bounds=pathFn.bounds(feature);
   const bW=bounds[1][0]-bounds[0][0],bH=bounds[1][1]-bounds[0][1];
@@ -515,7 +491,7 @@ function zoomToFeature(feature){
 
 function zoomToRegion(region){
   const r=REGION_BOUNDS[region];if(!r)return;
-  const mapArea=document.getElementById("map-area");
+  const mapArea=document.getElementById('map-area');
   const W=mapArea.clientWidth,H=mapArea.clientHeight;
   const center=proj([r.center[0],r.center[1]]);
   const scale=r.scale/153;
@@ -525,88 +501,198 @@ function zoomToRegion(region){
 
 function resetZoom(){
   svgEl.transition().duration(600).call(zoomBehavior.transform,d3.zoomIdentity);
-  document.getElementById("reset-btn").style.display="none";
-  document.getElementById("panel").classList.remove("open");
-  if(selEl){d3.select(selEl).classed("sel",false);selEl=null;}
-  clearMarkers();
+  document.getElementById('reset-btn').style.display='none';
+  document.getElementById('panel').classList.remove('open');
+  if(selEl){d3.select(selEl).classed('sel',false);selEl=null;}
 }
 
-document.getElementById("close-btn").addEventListener("click",resetZoom);
-document.getElementById("reset-btn").addEventListener("click",resetZoom);
+document.getElementById('close-btn').addEventListener('click',resetZoom);
+document.getElementById('reset-btn').addEventListener('click',resetZoom);
 
-document.querySelectorAll(".rpill").forEach(btn=>{
-  btn.addEventListener("click",function(){
-    document.querySelectorAll(".rpill").forEach(b=>b.classList.remove("on"));
-    this.classList.add("on");
+document.querySelectorAll('.rpill').forEach(btn=>{
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.rpill').forEach(b=>b.classList.remove('on'));
+    this.classList.add('on');
     const region=this.dataset.region;
-    if(region==="all"){resetZoom();}
+    if(region==='all'){resetZoom();}
     else{
-      document.getElementById("reset-btn").style.display="flex";
+      document.getElementById('reset-btn').style.display='flex';
       zoomToRegion(region);
       renderContinent(region);
     }
   });
 });
 
-document.getElementById("sinput").addEventListener("input",function(){
+document.getElementById('sinput').addEventListener('input',function(){
   const q=this.value.trim().toLowerCase();if(!q)return;
   const match=Object.keys(DB).find(k=>DB[k].searchTags.some(tag=>tag.includes(q)));
   if(match){
-    if(selEl)d3.select(selEl).classed("sel",false);
-    gEl.selectAll(".cp").each(function(d){
-      const id=String(d.id).padStart(3,"0");
-      if(IDS[id]===match){selEl=this;d3.select(this).classed("sel",true);zoomToFeature(d);}
+    if(selEl)d3.select(selEl).classed('sel',false);
+    gEl.selectAll('.cp').each(function(d){
+      const id=String(d.id).padStart(3,'0');
+      if(IDS[id]===match){selEl=this;d3.select(this).classed('sel',true);zoomToFeature(d);}
     });
     renderPanel(match);
-    document.getElementById("reset-btn").style.display="flex";
+    document.getElementById('reset-btn').style.display='flex';
   }
 });
 
+// ── 챗봇 ─────────────────────────────────────────
+let chatCountry=null;
+let chatHistory=[];
+
+function openChat(){
+  const name=document.getElementById('c-name').textContent;
+  const enName=document.getElementById('c-en').textContent;
+  const flag=document.getElementById('c-flag').textContent;
+  chatCountry={kr:name,en:enName,flag};
+
+  document.getElementById('chat-header-flag').textContent=flag||'🌍';
+  document.getElementById('chat-header-title').textContent=name+' — AI 도우미';
+
+  const msgs=document.getElementById('chat-messages');
+  msgs.innerHTML='';
+  chatHistory=[];
+
+  // 웰컴 메시지 + 추천 질문
+  const welcome=document.createElement('div');
+  welcome.className='msg bot';
+  welcome.innerHTML=`<b>${name}</b>에 대해 무엇이든 물어보세요!<br><span style="color:var(--t3);font-size:11px;">기후, 지형, 종교, 인구, 역사 등 기본 정보를 답해드려요.</span>
+  <div class="chat-suggestions" style="margin-top:8px;">
+    <span class="chat-sugg" onclick="sendSugg('기후 특징을 알려줘')">기후 특징</span>
+    <span class="chat-sugg" onclick="sendSugg('주요 지형을 설명해줘')">주요 지형</span>
+    <span class="chat-sugg" onclick="sendSugg('종교와 언어는?')">종교·언어</span>
+    <span class="chat-sugg" onclick="sendSugg('인구와 도시화 특징은?')">인구·도시화</span>
+    <span class="chat-sugg" onclick="sendSugg('주요 자원과 산업은?')">자원·산업</span>
+  </div>`;
+  msgs.appendChild(welcome);
+
+  document.getElementById('chat-modal').classList.add('open');
+}
+
+function closeChat(){
+  document.getElementById('chat-modal').classList.remove('open');
+}
+
+function sendSugg(text){
+  document.getElementById('chat-input').value=text;
+  sendChat();
+}
+
+async function sendChat(){
+  const input=document.getElementById('chat-input');
+  const q=input.value.trim();
+  if(!q)return;
+  input.value='';
+
+  const msgs=document.getElementById('chat-messages');
+
+  // 사용자 메시지
+  const userMsg=document.createElement('div');
+  userMsg.className='msg user';
+  userMsg.textContent=q;
+  msgs.appendChild(userMsg);
+
+  // 로딩
+  const loadMsg=document.createElement('div');
+  loadMsg.className='msg bot loading';
+  loadMsg.textContent='답변 생성 중...';
+  msgs.appendChild(loadMsg);
+  msgs.scrollTop=msgs.scrollHeight;
+
+  document.getElementById('chat-send').disabled=true;
+
+  chatHistory.push({role:'user',content:q});
+
+  try{
+    const systemPrompt=`너는 수능 세계지리 전문 AI 도우미야. 지금 학생이 "${chatCountry?.kr||''} (${chatCountry?.en||''})"에 대해 질문하고 있어.
+
+역할:
+- 이 나라의 기후, 지형, 종교, 언어, 인구, 도시화, 역사, 문화 등 기본 지리 정보를 수능 수험생 수준에 맞게 명확하게 설명해줘
+- 수능에서 자주 출제되는 개념은 강조해줘
+- 답변은 간결하고 명확하게, 3~5문장 내외로
+- 한국어로 답변해줘`;
+
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:1000,
+        system:systemPrompt,
+        messages:chatHistory
+      })
+    });
+
+    const data=await res.json();
+    const answer=data.content?.[0]?.text||'답변을 가져오지 못했어요.';
+
+    chatHistory.push({role:'assistant',content:answer});
+
+    loadMsg.classList.remove('loading');
+    loadMsg.textContent=answer;
+  }catch(e){
+    loadMsg.classList.remove('loading');
+    loadMsg.textContent='오류가 발생했어요. 다시 시도해주세요.';
+    chatHistory.pop();
+  }finally{
+    document.getElementById('chat-send').disabled=false;
+    msgs.scrollTop=msgs.scrollHeight;
+  }
+}
+
+document.getElementById('chat-input').addEventListener('keydown',function(e){
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendChat();}
+});
+document.getElementById('chat-modal').addEventListener('click',function(e){
+  if(e.target===this)closeChat();
+});
+
+// ── 지도 초기화 ───────────────────────────────────
 async function init(){
-  // Supabase에서 데이터 로드
-  const rows = await fetchCountries();
-  if(rows.length > 0){
-    DB = {};
-    rows.forEach(row => { DB[row.name_en] = parseCountry(row); });
+  const rows=await fetchCountries();
+  if(rows.length>0){
+    DB={};
+    rows.forEach(row=>{DB[row.name_en]=parseCountry(row);});
     buildIDS();
-    document.getElementById('data-count').textContent = Object.keys(DB).length + '개국';
-  } else {
-    // fallback: 기존 샘플 데이터 사용
-    DB = FALLBACK_DB;
-    buildIDS();
+    document.getElementById('data-count').textContent=Object.keys(DB).length+'개국';
   }
 
-  const world = await d3.json("https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json");
-  svgEl=d3.select("#world-svg");
-  gEl=d3.select("#map-g");
-  markerG=d3.select("#marker-g");
+  const world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
+  svgEl=d3.select('#world-svg');
+  gEl=d3.select('#map-g');
+  markerG=d3.select('#marker-g');
   proj=d3.geoNaturalEarth1().scale(153).translate([480,265]);
   pathFn=d3.geoPath().projection(proj);
   const feats=topojson.feature(world,world.objects.countries).features;
-  zoomBehavior=d3.zoom().scaleExtent([1,12]).on("zoom",e=>{
-    gEl.attr("transform",e.transform);
-    gEl.selectAll(".cp").attr("stroke-width",0.5/e.transform.k);
-    redrawMarkers();
+
+  zoomBehavior=d3.zoom().scaleExtent([1,12]).on('zoom',e=>{
+    gEl.attr('transform',e.transform);
+    gEl.selectAll('.cp').attr('stroke-width',0.5/e.transform.k);
   });
   svgEl.call(zoomBehavior);
-  document.getElementById("zi").addEventListener("click",()=>svgEl.transition().duration(300).call(zoomBehavior.scaleBy,1.5));
-  document.getElementById("zo").addEventListener("click",()=>svgEl.transition().duration(300).call(zoomBehavior.scaleBy,0.67));
-  gEl.selectAll("path").data(feats).join("path")
-    .attr("class",d=>"cp"+(IDS[String(d.id).padStart(3,"0")]?" hd":""))
-    .attr("d",pathFn)
-    .on("click",function(e,d){
+
+  document.getElementById('zi').addEventListener('click',()=>svgEl.transition().duration(300).call(zoomBehavior.scaleBy,1.5));
+  document.getElementById('zo').addEventListener('click',()=>svgEl.transition().duration(300).call(zoomBehavior.scaleBy,0.67));
+
+  gEl.selectAll('path').data(feats).join('path')
+    .attr('class',d=>'cp'+(IDS[String(d.id).padStart(3,'0')]?' hd':''))
+    .attr('d',pathFn)
+    .on('click',function(e,d){
       e.stopPropagation();
-      if(selEl)d3.select(selEl).classed("sel",false);
-      selEl=this;d3.select(this).classed("sel",true);
-      document.querySelectorAll(".rpill").forEach(b=>b.classList.remove("on"));
-      document.querySelector(".rpill[data-region='all']").classList.add("on");
-      const name=IDS[String(d.id).padStart(3,"0")]||null;
+      if(selEl)d3.select(selEl).classed('sel',false);
+      selEl=this;d3.select(this).classed('sel',true);
+      document.querySelectorAll('.rpill').forEach(b=>b.classList.remove('on'));
+      document.querySelector(".rpill[data-region='all']").classList.add('on');
+      const name=IDS[String(d.id).padStart(3,'0')]||null;
       renderPanel(name||null);
-      document.getElementById("reset-btn").style.display="flex";
+      document.getElementById('reset-btn').style.display='flex';
       setTimeout(()=>zoomToFeature(d),50);
     });
-  svgEl.on("click",()=>resetZoom());
+
+  svgEl.on('click',()=>resetZoom());
 }
+
 init();
 </script>
 </body>
