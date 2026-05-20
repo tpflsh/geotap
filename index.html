@@ -493,9 +493,10 @@ function zoomToRegion(region){
   const r=REGION_BOUNDS[region];if(!r)return;
   const mapArea=document.getElementById('map-area');
   const W=mapArea.clientWidth,H=mapArea.clientHeight;
+  const effectiveW=W-320; // 패널 320px 제외한 유효 너비
   const center=proj([r.center[0],r.center[1]]);
   const scale=r.scale/153;
-  const tx=W/2-scale*center[0],ty=H/2-scale*center[1];
+  const tx=effectiveW/2-scale*center[0],ty=H/2-scale*center[1];
   svgEl.transition().duration(750).call(zoomBehavior.transform,d3.zoomIdentity.translate(tx,ty).scale(scale));
 }
 
