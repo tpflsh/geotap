@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>GeoTap — 수능 세계지리 학습 대시보드</title>
+<title>GeoTap — 통합사회 지리 학습 대시보드</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.10.0/dist/tabler-icons.min.css">
 <style>
 :root{
@@ -266,8 +266,8 @@ body{background:#000;display:flex;align-items:center;justify-content:center;min-
 
     <div id="bbar">
       <span class="bs"><i class="ti ti-world" style="font-size:12px;"></i>&nbsp;전체 <span class="bv">195개국</span></span>
-      <span class="bs">데이터 보유 <span class="bv g" id="data-count">로딩 중...</span></span>
-      <span class="bs" style="margin-left:auto;">수능 세계지리 · 평가원 기출 기반</span>
+      <span class="bs">데이터 보유 <span class="bv g" id="data-count">불러오는 중</span></span>
+      <span class="bs" style="margin-left:auto;">수능 통합사회 · 평가원 기출 기반</span>
     </div>
   </div>
 </div>
@@ -663,8 +663,9 @@ async function init(){
     DB={};
     rows.forEach(row=>{DB[row.name_en]=parseCountry(row);});
     buildIDS();
-    document.getElementById('data-count').textContent=Object.keys(DB).length+'개국';
   }
+  const dataCount=Object.keys(DB).length;
+  document.getElementById('data-count').textContent=dataCount>0?dataCount+'개국':'콘텐츠 구축 중';
 
   const world=await d3.json('https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json');
   svgEl=d3.select('#world-svg');
